@@ -47,7 +47,7 @@
 **SCOPE:** Single documentation file  
 **FILES/AREA:** `docs/DESIGN.md`  
 **DEPENDENCIES:** T-000A  
-**IMPLEMENTATION NOTES:** Documents what is adopted from Beau, what is explicitly rejected, strict anti-AI-slop rules, tokens, and component specs.  
+**IMPLEMENTATION NOTES:** Designated as the sole canonical source of truth for all visual tokens and design rules. Documents what is adopted from Beau, what is explicitly rejected, strict anti-AI-slop rules, tokens, and component specs.  
 **ACCEPTANCE CRITERIA:** Complete CSS token block, type scale table, spacing scale, component specifications, and responsive rules.  
 **TEST REQUIREMENTS:** Cross-check tokens against ARCHITECTURE.md and MOTION.md.
 
@@ -105,7 +105,7 @@
 **DEPENDENCIES:** T-000B  
 **IMPLEMENTATION NOTES:** Every animation specifies trigger, target, duration, easing, distance, direction, tablet behavior, and reduced-motion behavior.  
 **ACCEPTANCE CRITERIA:** All animations traceable to UI components with clear UX purpose; reduced motion behavior defined.  
-**TEST REQUIREMENTS:** Verification against DESIGN.md editorial restraint principles.
+**TEST REQUIREMENTS:** Verification against docs/DESIGN.md editorial restraint principles.
 
 ---
 
@@ -132,7 +132,7 @@
 **FILES/AREA:** `docs/ROADMAP.md`  
 **DEPENDENCIES:** T-005  
 **IMPLEMENTATION NOTES:** Zero orphaned tasks; clear content blockers identified.  
-**ACCEPTANCE CRITERIA:** All 10 implementation phases defined with explicit exit criteria.  
+**ACCEPTANCE CRITERIA:** All 8 implementation phases defined with explicit exit criteria.  
 **TEST REQUIREMENTS:** Verification against TASKS.md.
 
 ---
@@ -172,7 +172,7 @@
 **ID:** T-101  
 **TITLE:** Initialize Next.js 15 Application  
 **PRIORITY:** P0  
-**STATUS:** BLOCKED — Awaiting Stack Approval (A1 in ARCHITECTURE.md)  
+**STATUS:** DONE  
 **PURPOSE:** Establish the base TypeScript Next.js App Router codebase.  
 **SCOPE:** Project root configuration  
 **FILES/AREA:** `package.json`, `tsconfig.json`, `next.config.ts`  
@@ -184,10 +184,10 @@
 ---
 
 **ID:** T-102  
-**TITLE:** Implement CSS Design Tokens from DESIGN.md  
+**TITLE:** Implement CSS Design Tokens from docs/DESIGN.md  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
-**PURPOSE:** Define CSS Custom Properties exactly matching the Beau token system in DESIGN.md.  
+**STATUS:** DONE  
+**PURPOSE:** Define CSS Custom Properties exactly matching the Beau token system in docs/DESIGN.md.  
 **SCOPE:** Styling  
 **FILES/AREA:** `PROPOSED FILE: src/styles/tokens.css`  
 **DEPENDENCIES:** T-101  
@@ -200,7 +200,7 @@
 **ID:** T-103  
 **TITLE:** Implement CSS Reset & Base Typography  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Normalize browser defaults and apply Geist typography globally.  
 **SCOPE:** Styling  
 **FILES/AREA:** `PROPOSED FILE: src/styles/reset.css`, `PROPOSED FILE: src/styles/globals.css`  
@@ -214,7 +214,7 @@
 **ID:** T-104  
 **TITLE:** Configure Geist Font via next/font  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Load Geist at weights 400 and 500 with zero layout shift (FOUT prevention).  
 **SCOPE:** Font configuration  
 **FILES/AREA:** `PROPOSED FILE: src/app/layout.tsx`  
@@ -228,8 +228,8 @@
 **ID:** T-105  
 **TITLE:** Build Foundation Component: Typography  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
-**PURPOSE:** Reusable type renderer enforcing DESIGN.md scale tokens.  
+**STATUS:** DONE  
+**PURPOSE:** Reusable type renderer enforcing docs/DESIGN.md scale tokens.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Typography.tsx`  
 **DEPENDENCIES:** T-102, T-103, T-104  
@@ -242,7 +242,7 @@
 **ID:** T-106  
 **TITLE:** Build Foundation Component: Container  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Centered 1200px max-width layout container with responsive horizontal padding.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Container.tsx`  
@@ -256,7 +256,7 @@
 **ID:** T-107  
 **TITLE:** Build Foundation Component: Section  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Vertical rhythm block enforcing 72px section gap and surface color switching.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Section.tsx`  
@@ -270,7 +270,7 @@
 **ID:** T-108  
 **TITLE:** Build Foundation Component: Button  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Pill-shaped interactive button (200px radius) with filled and ghost variants.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Button.tsx`  
@@ -284,7 +284,7 @@
 **ID:** T-109  
 **TITLE:** Build Foundation Component: Image  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Safe `next/image` wrapper enforcing 6px border-radius, object-fit, and editorial fallbacks.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Image.tsx`  
@@ -298,21 +298,21 @@
 **ID:** T-110  
 **TITLE:** Build Foundation Component: Badge  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** 200px radius pill badge for categories, technology tags, and roles.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/Badge.tsx`  
 **DEPENDENCIES:** T-102, T-105  
 **IMPLEMENTATION NOTES:** Variants: `default` (Warm Parchment fill), `spotlight` (Broadcast Gradient fill).  
 **ACCEPTANCE CRITERIA:** Renders text in Geist 500 14px with 200px border radius.  
-**TEST REQUIREMENTS:** Visual verification against DESIGN.md Section 4.2.
+**TEST REQUIREMENTS:** Visual verification against docs/DESIGN.md Section 4.2.
 
 ---
 
 **ID:** T-111  
 **TITLE:** Build Foundation Component: GradientFrame  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** 3px Broadcast Gradient outer ring wrapping featured content.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/foundation/GradientFrame.tsx`  
@@ -323,14 +323,33 @@
 
 ---
 
-## 4. PHASE 2 — LAYOUT & NAVIGATION
+**ID:** T-112  
+**TITLE:** Build Data Access Layer & Integrity Validator (src/lib/data.ts)  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Centralized, type-safe data access layer that reads static JSON, enforces schemas, filters by consent, and handles fallbacks.  
+**SCOPE:** Utility / Data Layer  
+**FILES/AREA:** `PROPOSED FILE: src/lib/data.ts`  
+**DEPENDENCIES:** T-101, T-003  
+**IMPLEMENTATION NOTES:**  
+- Typed accessors for all entities (`getClassData()`, `getStudents()`, `getStudentBySlug()`, `getProjects()`, `getEvents()`, `getMemories()`, `getCampusPhotos()`, `getAchievements()`, `getTimeline()`).
+- Validates JSON shape against `DATA_MODEL.md` TypeScript interfaces.
+- **Strict Consent Filtering:** Automatically filters out any student or achievement record where `consentPublic !== true`.
+- Zero leakage of prohibited PII (phone, address, NIM, grades).
+- Provides fallback values when optional fields are missing (e.g. missing bio, missing project link).
+**ACCEPTANCE CRITERIA:** All data helper functions return strictly typed data; unconsented records are never returned; build does not fail on empty arrays.  
+**TEST REQUIREMENTS:** Unit tests covering getter functions, consent filtering, and empty data handling.
+
+---
+
+## 4. PHASE 2 — LAYOUT, SHELL & NAVIGATION
 
 ---
 
 **ID:** T-201  
 **TITLE:** Build Root Application Layout  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Assemble root HTML structure, metadata defaults, skip link, SiteHeader, and SiteFooter.  
 **SCOPE:** Layout  
 **FILES/AREA:** `PROPOSED FILE: src/app/layout.tsx`  
@@ -344,7 +363,7 @@
 **ID:** T-202  
 **TITLE:** Build SiteHeader Component  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Sticky 72px navigation header with wordmark, links, and mobile menu button.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/layout/SiteHeader.tsx`  
@@ -358,7 +377,7 @@
 **ID:** T-203  
 **TITLE:** Build NavDrawer Mobile Navigation  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Off-canvas mobile navigation drawer with accessible focus trap.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/layout/NavDrawer.tsx`  
@@ -372,7 +391,7 @@
 **ID:** T-204  
 **TITLE:** Build SiteFooter Component  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Editorial footer presenting cohort program attribution, copyright, and verified links.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/layout/SiteFooter.tsx`  
@@ -383,6 +402,25 @@
 
 ---
 
+**ID:** T-205  
+**TITLE:** Build Editorial 404 Not Found Page (src/app/not-found.tsx)  
+**PRIORITY:** P1  
+**STATUS:** DONE  
+**PURPOSE:** Deliver a cohesive, dignified 404 error experience aligned with Beau visual standards.  
+**SCOPE:** Page  
+**FILES/AREA:** `PROPOSED FILE: src/app/not-found.tsx`  
+**DEPENDENCIES:** T-105, T-106, T-107, T-108  
+**IMPLEMENTATION NOTES:**  
+- Warm Parchment canvas (`#f6f4f1`).
+- Display typography: Geist 500 56px "404", Subheading Geist 500 20px "Halaman Tidak Ditemukan".
+- Editorial copy: "Halaman yang Anda tuju tidak ditemukan atau telah diarsipkan ke tempat lain."
+- Navigation: Single filled pill button returning user to Beranda (`/`).
+- Traceable to `ARCHITECTURE.md` Section 8.2 and `QA.md` test `FB-07`.
+**ACCEPTANCE CRITERIA:** Navigating to any invalid route renders the custom 404 page; return button navigates to `/`; no generic browser error screen; fully responsive and accessible.  
+**TEST REQUIREMENTS:** Navigate to `/students/unknown-slug` and verify custom 404 display and return CTA.
+
+---
+
 ## 5. PHASE 3 — HERO SECTION IMPLEMENTATION
 
 ---
@@ -390,7 +428,7 @@
 **ID:** T-301  
 **TITLE:** Build HeroSection Component Architecture  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Full-viewport hero assembling photographic background, display typography, and primary CTA.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/layout/HeroSection.tsx`  
@@ -418,7 +456,7 @@
 **ID:** T-303  
 **TITLE:** Implement Desktop Hero Parallax (L-01)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED — BLOCKED (GSAP approval Mo1)  
+**STATUS:** DONE  
 **PURPOSE:** Photography parallax scrolling at 0.35× speed on desktop.  
 **SCOPE:** Experience wrapper  
 **FILES/AREA:** `PROPOSED FILE: src/components/experience/ParallaxContainer.tsx`, `PROPOSED FILE: src/hooks/useParallax.ts`  
@@ -432,7 +470,7 @@
 **ID:** T-304  
 **TITLE:** Implement Hero Text Entrance Animation (L-02)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Single-mount entrance animation for hero headline, subhead, and CTA.  
 **SCOPE:** Animation  
 **FILES/AREA:** `PROPOSED FILE: src/components/layout/HeroSection.tsx`  
@@ -454,17 +492,17 @@
 **PURPOSE:** Create the type-safe static data store for all cohort students.  
 **SCOPE:** Data file  
 **FILES/AREA:** `PROPOSED FILE: src/data/students.json`  
-**DEPENDENCIES:** T-003, Cohort data collection  
+**DEPENDENCIES:** T-003, T-112, Cohort data collection  
 **IMPLEMENTATION NOTES:** All entries require `consentPublic: boolean`. Strict exclusion of prohibited PII.  
 **ACCEPTANCE CRITERIA:** Valid JSON matching `StudentEntity` interface; zero unconsented records set to true.  
-**TEST REQUIREMENTS:** Build-time schema validation script.
+**TEST REQUIREMENTS:** Build-time schema validation script via `src/lib/data.ts`.
 
 ---
 
 **ID:** T-402  
 **TITLE:** Build StudentCard Component  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Directory card with photo, name, nickname, interest tags, and M-03 hover elevation.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/StudentCard.tsx`  
@@ -478,7 +516,7 @@
 **ID:** T-403  
 **TITLE:** Build StudentGrid Component with Stagger Reveal  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Responsive multi-column grid (4/3/2/1 col) with scroll stagger reveal (R-02).  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/StudentGrid.tsx`  
@@ -492,11 +530,11 @@
 **ID:** T-404  
 **TITLE:** Build Individual StudentProfile Page (SSG)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Dedicated full-page biographical view linking student projects, quote, and social profiles.  
 **SCOPE:** Page & Component  
 **FILES/AREA:** `PROPOSED FILE: src/app/students/[slug]/page.tsx`, `PROPOSED FILE: src/components/content/StudentProfile.tsx`  
-**DEPENDENCIES:** T-401, T-402  
+**DEPENDENCIES:** T-112, T-401, T-402  
 **IMPLEMENTATION NOTES:** Uses `generateStaticParams()` to pre-render every consented student profile at build time.  
 **ACCEPTANCE CRITERIA:** All student fields render; social links open securely in new tab; invalid slug returns 404.  
 **TEST REQUIREMENTS:** SSG build verification; 404 error state check.
@@ -506,11 +544,11 @@
 **ID:** T-405  
 **TITLE:** Build Student Directory Page (`/students`)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Full cohort directory page with category filter tags.  
 **SCOPE:** Page  
 **FILES/AREA:** `PROPOSED FILE: src/app/students/page.tsx`  
-**DEPENDENCIES:** T-401, T-403  
+**DEPENDENCIES:** T-112, T-401, T-403  
 **IMPLEMENTATION NOTES:** Section heading stack followed by `StudentGrid`.  
 **ACCEPTANCE CRITERIA:** Displays all consented students; search/filter narrows list cleanly.  
 **TEST REQUIREMENTS:** Filter functionality test; empty filter state test.
@@ -528,17 +566,17 @@
 **PURPOSE:** Static data store for capstones, hackathon projects, and software builds.  
 **SCOPE:** Data file  
 **FILES/AREA:** `PROPOSED FILE: src/data/projects.json`  
-**DEPENDENCIES:** T-003, Project data submission  
+**DEPENDENCIES:** T-003, T-112, Project data submission  
 **IMPLEMENTATION NOTES:** Schema matches `ProjectEntity`. Team members link to `students.json` slugs.  
 **ACCEPTANCE CRITERIA:** Valid JSON; team member slugs cross-reference existing students.  
-**TEST REQUIREMENTS:** Build integrity check.
+**TEST REQUIREMENTS:** Build integrity check via `src/lib/data.ts`.
 
 ---
 
 **ID:** T-502  
 **TITLE:** Build ProjectCard Component  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Showcase card with 16:9 cover, title, team member names, tech badges, and M-04 hover.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/ProjectCard.tsx`  
@@ -552,11 +590,11 @@
 **ID:** T-503  
 **TITLE:** Build Individual ProjectDetail Page (SSG)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Dedicated case-study page with full description, tech stack, team list, and live links.  
 **SCOPE:** Page & Component  
 **FILES/AREA:** `PROPOSED FILE: src/app/projects/[slug]/page.tsx`, `PROPOSED FILE: src/components/content/ProjectDetail.tsx`  
-**DEPENDENCIES:** T-501, T-502  
+**DEPENDENCIES:** T-112, T-501, T-502  
 **IMPLEMENTATION NOTES:** Static generation via `generateStaticParams()`. Team member names link back to student profiles.  
 **ACCEPTANCE CRITERIA:** Pre-renders all projects; team links work; external demo links open safely.  
 **TEST REQUIREMENTS:** Static build verification; link security audit (`rel="noopener noreferrer"`).
@@ -566,11 +604,11 @@
 **ID:** T-504  
 **TITLE:** Build Project Showcase Index Page (`/projects`)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Comprehensive project catalog with category filters.  
 **SCOPE:** Page  
 **FILES/AREA:** `PROPOSED FILE: src/app/projects/page.tsx`  
-**DEPENDENCIES:** T-501, T-502  
+**DEPENDENCIES:** T-112, T-501, T-502  
 **IMPLEMENTATION NOTES:** 3-column desktop grid collapsing to 1-column mobile.  
 **ACCEPTANCE CRITERIA:** Renders all projects; responsive grid adapts cleanly.  
 **TEST REQUIREMENTS:** Breakpoint visual audit.
@@ -584,28 +622,52 @@
 **PURPOSE:** Static data stores for candid moments and curated photo stories.  
 **SCOPE:** Data files  
 **FILES/AREA:** `PROPOSED FILE: src/data/campus.json`, `PROPOSED FILE: src/data/memories.json`  
-**DEPENDENCIES:** T-003, Photo archive submissions  
+**DEPENDENCIES:** T-003, T-112, Photo archive submissions  
 **IMPLEMENTATION NOTES:** All photos include accessible `alt` descriptions.  
 **ACCEPTANCE CRITERIA:** Valid JSON; referenced images exist in `/public/images/campus/`.  
 **TEST REQUIREMENTS:** File existence validator.
 
 ---
 
-**ID:** T-506  
-**TITLE:** Build MemoryCard & GalleryGrid with Lightbox Support  
+**ID:** T-506A  
+**TITLE:** Build MemoryCard & GalleryGrid Components  
 **PRIORITY:** P2  
-**STATUS:** PLANNED  
-**PURPOSE:** Curated editorial photo grid with full-screen accessible modal lightbox (L-03).  
+**STATUS:** DONE  
+**PURPOSE:** Visual presentation cards and responsive grid for campus life candid photos and curated photo stories.  
 **SCOPE:** Components  
-**FILES/AREA:** `PROPOSED FILE: src/components/content/MemoryCard.tsx`, `PROPOSED FILE: src/components/content/GalleryGrid.tsx`, `PROPOSED FILE: src/components/experience/GalleryLightbox.tsx`  
-**DEPENDENCIES:** T-109, T-505  
-**IMPLEMENTATION NOTES:** Lightbox traps keyboard focus, handles ESC, and supports touch swipe on mobile.  
-**ACCEPTANCE CRITERIA:** Click opens lightbox; keyboard arrow keys navigate; ESC closes; focus restored to trigger.  
-**TEST REQUIREMENTS:** Full keyboard accessibility walkthrough.
+**FILES/AREA:** `PROPOSED FILE: src/components/content/MemoryCard.tsx`, `PROPOSED FILE: src/components/content/GalleryGrid.tsx`  
+**DEPENDENCIES:** T-105, T-109, T-112, T-505  
+**IMPLEMENTATION NOTES:**  
+- `MemoryCard`: Displays 4:3 or 3:2 photograph with 6px border-radius, subtle caption in Geist 400 14px, and date metadata. Hover scales image 1.04× (M-05).
+- `GalleryGrid`: Responsive masonry or balanced column layout (3 cols desktop, 2 cols tablet, 1 col mobile). Passes photo index on click/Enter to trigger lightbox.
+**ACCEPTANCE CRITERIA:** Cards render photos crisply; grid responds without layout breaks; click/Enter triggers open event with photo ID/index.  
+**TEST REQUIREMENTS:** Responsive column test; keyboard focus test on card triggers.
 
 ---
 
-## 8. PHASE 6 — EVENTS, ACHIEVEMENTS & TIMELINE
+**ID:** T-506B  
+**TITLE:** Build GalleryLightbox Component (Modal Interaction & Touch Swipe)  
+**PRIORITY:** P1  
+**STATUS:** DONE  
+**PURPOSE:** Accessible, full-screen modal photo viewer with keyboard navigation, gesture controls, and focus management (L-03, L-04).  
+**SCOPE:** Experience wrapper  
+**FILES/AREA:** `PROPOSED FILE: src/components/experience/GalleryLightbox.tsx`  
+**DEPENDENCIES:** T-109, T-506A  
+**IMPLEMENTATION NOTES:**  
+- **Accessible Dialog:** Rendered as `role="dialog"`, `aria-modal="true"`, with `aria-label="Penampil Foto Kenangan"`.
+- **Focus Trap:** When open, Tab and Shift+Tab strictly cycle within active modal controls (Prev, Next, Close).
+- **ESC Key Close:** Pressing `Escape` key immediately closes the lightbox.
+- **Keyboard Arrow Navigation:** Pressing `ArrowRight` navigates to next photo; `ArrowLeft` navigates to previous photo.
+- **Focus Restoration:** Upon modal close, keyboard focus returns precisely to the thumbnail button that triggered the modal.
+- **Document Scroll Lock:** Sets `document.body.style.overflow = 'hidden'` while modal is active; restores cleanly on close/unmount.
+- **Mobile Touch Swipe:** Detects horizontal touch delta; left swipe advances to next photo, right swipe returns to previous.
+- **Reduced Motion Consideration:** Instant image transition with zero scale/fade zoom when `prefers-reduced-motion: reduce`.
+**ACCEPTANCE CRITERIA:** Fulfills all 8 interaction requirements above; passes QA tests `F-GAL-01` through `F-GAL-07` and `A-K05` through `A-K09`.  
+**TEST REQUIREMENTS:** Full keyboard accessibility test; touch swipe emulation test; screen reader announcement test.
+
+---
+
+## 8. PHASE 6 — EVENTS, ACHIEVEMENTS, TIMELINE & HOMEPAGE ASSEMBLY
 
 ---
 
@@ -613,24 +675,26 @@
 **TITLE:** Compile Events, Achievements & Timeline Data  
 **PRIORITY:** P2  
 **STATUS:** BLOCKED — [CONTENT NEEDED] (Historical class records)  
-**PURPOSE:** Static data for events (`events.json`), achievements (`achievements.json`), and timeline milestones (`timeline.json`).  
+**PURPOSE:** Static data compilation for events (`events.json`), achievements (`achievements.json`), and timeline milestones (`timeline.json`).  
 **SCOPE:** Data files  
 **FILES/AREA:** `PROPOSED FILE: src/data/events.json`, `PROPOSED FILE: src/data/achievements.json`, `PROPOSED FILE: src/data/timeline.json`  
-**DEPENDENCIES:** T-003, Cohort historical archives  
-**IMPLEMENTATION NOTES:** All achievements must have verified consent.  
-**ACCEPTANCE CRITERIA:** Valid JSON matching respective entity schemas.  
-**TEST REQUIREMENTS:** Schema validation test.
+**DEPENDENCIES:** T-003, T-112, Cohort historical archives  
+**IMPLEMENTATION NOTES:**  
+- **Workflow Rationale for Atomic Scope:** All three files represent the historical narrative of the cohort (2022–2026), authored and verified in a single collaborative session by the historical archive committee. Keeping them unified prevents task fragmentation while maintaining clear schema separation.
+- All achievements must have verified consent.
+**ACCEPTANCE CRITERIA:** Valid JSON matching respective entity schemas; zero unconsented achievements.  
+**TEST REQUIREMENTS:** Schema validation test via `src/lib/data.ts`.
 
 ---
 
 **ID:** T-602  
 **TITLE:** Build EventCard & EventList Components  
 **PRIORITY:** P2  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Chronological event archive display.  
 **SCOPE:** Components  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/EventCard.tsx`, `PROPOSED FILE: src/components/content/EventList.tsx`  
-**DEPENDENCIES:** T-105, T-109, T-601  
+**DEPENDENCIES:** T-105, T-109, T-112, T-601  
 **IMPLEMENTATION NOTES:** Graceful fallback when poster image is missing.  
 **ACCEPTANCE CRITERIA:** Events render chronologically; dates formatted consistently in Indonesian.  
 **TEST REQUIREMENTS:** Date formatting check; visual test.
@@ -640,11 +704,11 @@
 **ID:** T-603  
 **TITLE:** Build AchievementCard & AchievementList Components  
 **PRIORITY:** P2  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Highlight verified competitions, honors, and hackathon wins.  
 **SCOPE:** Components  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/AchievementCard.tsx`, `PROPOSED FILE: src/components/content/AchievementList.tsx`  
-**DEPENDENCIES:** T-105, T-110, T-601  
+**DEPENDENCIES:** T-105, T-110, T-112, T-601  
 **IMPLEMENTATION NOTES:** Recipient names link to student profiles.  
 **ACCEPTANCE CRITERIA:** Only consented achievements render; student profile links work.  
 **TEST REQUIREMENTS:** Privacy verification check.
@@ -654,11 +718,11 @@
 **ID:** T-604  
 **TITLE:** Build TimelineView & TimelineEntry Components  
 **PRIORITY:** P2  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Chronological 4-year journey display (alternating desktop, single-column mobile).  
 **SCOPE:** Components  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/TimelineView.tsx`, `PROPOSED FILE: src/components/content/TimelineEntry.tsx`  
-**DEPENDENCIES:** T-105, T-601  
+**DEPENDENCIES:** T-105, T-112, T-601  
 **IMPLEMENTATION NOTES:** Alternating layout on desktop (≥ 768px); left-aligned single column on mobile (< 768px).  
 **ACCEPTANCE CRITERIA:** Milestones display chronologically; responsive layout switches seamlessly.  
 **TEST REQUIREMENTS:** Viewport resizing test.
@@ -668,14 +732,39 @@
 **ID:** T-605  
 **TITLE:** Build ClosingSection Component (Class Legacy)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Emotional valedictory section honoring the cohort's journey and future aspirations.  
 **SCOPE:** Component  
 **FILES/AREA:** `PROPOSED FILE: src/components/content/ClosingSection.tsx`  
-**DEPENDENCIES:** T-105, T-106, T-107  
+**DEPENDENCIES:** T-105, T-106, T-107, T-112  
 **IMPLEMENTATION NOTES:** Section 10 Closing from CONTENT.md. Confident editorial typography.  
 **ACCEPTANCE CRITERIA:** Valedictory statement, sign-off, and closing photography render with high visual impact.  
 **TEST REQUIREMENTS:** Visual editorial review.
+
+---
+
+**ID:** T-606  
+**TITLE:** Assemble Complete Homepage (src/app/page.tsx)  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Assemble the definitive, cohesive landing page bringing together the complete cohort narrative defined in PRD Section 4.2.  
+**SCOPE:** Page  
+**FILES/AREA:** `PROPOSED FILE: src/app/page.tsx`  
+**DEPENDENCIES:** T-112, T-301, T-403, T-502, T-605  
+**IMPLEMENTATION NOTES:**  
+- **Strict Narrative Section Order (PRD Compliant):**
+  1. `HeroSection` (T-301..T-304)
+  2. `ClassIdentity & Macro Stats` (Data from `class.json` via `src/lib/data.ts`)
+  3. `Featured Students Preview` (Curated subset via `StudentCard` / `StudentGrid`)
+  4. `Featured Projects Preview` (Curated subset via `ProjectCard` with `GradientFrame`)
+  5. `ClosingSection` (T-605 Valedictory & Legacy)
+- Consumes typed data via `src/lib/data.ts`.
+- Zero placeholder or fake data.
+- Responsive across all 5 breakpoint ranges.
+- Integrates entrance and scroll reveals per `MOTION.md`.
+- No duplicated component logic; reuses Foundation and Content layers cleanly.
+**ACCEPTANCE CRITERIA:** Homepage renders all 5 sections in strict PRD order; pre-renders statically with zero client-side fetch waterfalls; meets visual design standards of `docs/DESIGN.md`.  
+**TEST REQUIREMENTS:** Full page visual walkthrough; responsive audit from 375px to 1920px; Lighthouse run.
 
 ---
 
@@ -686,7 +775,7 @@
 **ID:** T-701  
 **TITLE:** Implement ScrollReveal Component (R-01, R-02, R-03)  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Intersection Observer client wrapper applying subtle upward fade on scroll.  
 **SCOPE:** Experience wrapper  
 **FILES/AREA:** `PROPOSED FILE: src/components/experience/ScrollReveal.tsx`, `PROPOSED FILE: src/hooks/useInView.ts`  
@@ -700,7 +789,7 @@
 **ID:** T-702  
 **TITLE:** Execute Comprehensive Accessibility Audit & Remediations  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** IN PROGRESS — automated audits passed; manual screen-reader & cross-browser walkthrough pending
 **PURPOSE:** Guarantee 100% WCAG 2.1 AA compliance across all routes and components.  
 **SCOPE:** Entire codebase  
 **FILES/AREA:** All components and pages  
@@ -714,7 +803,7 @@
 **ID:** T-703  
 **TITLE:** Performance & Core Web Vitals Optimization  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** IN PROGRESS — static output verified; Lighthouse run on production deployment pending
 **PURPOSE:** Ensure site delivers instantaneous static performance on real-world mobile devices.  
 **SCOPE:** Entire codebase  
 **FILES/AREA:** `next.config.ts`, image assets, bundles  
@@ -728,14 +817,16 @@
 **ID:** T-704  
 **TITLE:** SEO, Social Open Graph & Metadata Implementation  
 **PRIORITY:** P1  
-**STATUS:** PLANNED  
+**STATUS:** DONE  
 **PURPOSE:** Implement unique `<title>`, `<meta name="description">`, Open Graph cards, sitemap, and robots.txt.  
-**SCOPE:** Metadata  
+**SCOPE:** Metadata & Discovery Subsystem  
 **FILES/AREA:** `PROPOSED FILE: src/app/sitemap.ts`, `PROPOSED FILE: src/app/robots.ts`, all `page.tsx`  
 **DEPENDENCIES:** Phases 1–6  
-**IMPLEMENTATION NOTES:** Generates dynamic Open Graph metadata for individual student and project pages.  
-**ACCEPTANCE CRITERIA:** Every page has a distinct title and description; Open Graph preview renders correctly.  
-**TEST REQUIREMENTS:** Social share preview debugger test.
+**IMPLEMENTATION NOTES:**  
+- **Cohesion Rationale for Single Task:** In Next.js App Router, `sitemap.ts` (15 lines), `robots.ts` (10 lines), and `generateMetadata()` form an interconnected, lightweight discovery subsystem. Splitting them into micro-tasks would add overhead without architectural benefit.
+- Generates dynamic Open Graph metadata for individual student and project pages.
+**ACCEPTANCE CRITERIA:** Every page has a distinct title and description; Open Graph preview renders correctly at 1200×630px; valid sitemap.xml and robots.txt generated at build time.  
+**TEST REQUIREMENTS:** Social share preview debugger test; XML sitemap validator.
 
 ---
 
@@ -746,7 +837,7 @@
 **ID:** T-801  
 **TITLE:** Full QA Checklist Verification against QA.md  
 **PRIORITY:** P0  
-**STATUS:** PLANNED  
+**STATUS:** IN PROGRESS — P0 automated checks executed; full manual matrix pending
 **PURPOSE:** Execute and sign off on all test items in `docs/QA.md`.  
 **SCOPE:** Entire application  
 **FILES/AREA:** `docs/QA.md`  

@@ -8,11 +8,12 @@
 ## 1. REPOSITORY & IMPLEMENTATION STATUS
 
 > [!IMPORTANT]
-> **CURRENT REPOSITORY STATE: Documentation Phase Only (Zero Implementation Files)**
-> - No `package.json` exists in the repository.
-> - No frontend framework, styling library, or animation packages are installed.
-> - No source code (`src/`), styling (`styles/`), or public asset (`public/`) directories exist yet.
-> - **All architectural specifications below represent the PROPOSED ARCHITECTURE and are PENDING APPROVAL before Phase 1 installation.**
+> **CURRENT REPOSITORY STATE: Implementation Phase — Phases 1–6 built, Phase 7 audits in progress**
+> - `package.json`, `tsconfig.json`, and `next.config.ts` exist; the approved stack is installed.
+> - `src/` (app, components, styles, data, lib, hooks, types) and `public/` (images, og, icons) exist.
+> - **Source of Truth Rule:** `docs/DESIGN.md` remains the **sole canonical design system document**.
+> - Production build passes: 11/11 routes prerendered; TypeScript strict mode passes.
+> - Implemented deviations from the original proposal are documented in §2.2 below.
 
 ### 1.1 Actual Repository State (CURRENT)
 ```text
@@ -20,7 +21,7 @@
 ├── .vscode/               ← Editor configuration
 ├── docs/                  ← Complete project documentation
 │   ├── PRD.md             ← Product requirements & goals
-│   ├── DESIGN.md          ← Visual design system & token source of truth
+│   ├── DESIGN.md          ← Sole canonical visual design system & token source of truth
 │   ├── ARCHITECTURE.md    ← System architecture (this document)
 │   ├── CONTENT.md         ← Content field schemas & editorial rules
 │   ├── DATA_MODEL.md      ← Static data schemas & relationships
@@ -29,6 +30,8 @@
 │   ├── ROADMAP.md         ← Phased implementation roadmap & blockers
 │   ├── QA.md              ← Comprehensive quality assurance checklist
 │   └── LICENSES.md        ← Third-party license audit & status
+├── .gitignore             ← Version control ignore rules
+└── README.md              ← High-level project introduction
 ```
 
 ---
@@ -39,15 +42,28 @@
 
 | Layer | Proposed Technology | Justification | Current Status |
 |-------|---------------------|---------------|----------------|
-| **Core Runtime / Framework** | Next.js 15 (App Router, React 19) | Native Static Site Generation (SSG), React Server Components (RSC) for zero-JS static content, built-in image & font optimization. | `PROPOSED — PENDING APPROVAL` |
-| **Language** | TypeScript 5.x | Strict end-to-end type safety mapping directly to `DATA_MODEL.md` schemas. | `PROPOSED — PENDING APPROVAL` |
-| **Styling** | Vanilla CSS (CSS Custom Properties) | Direct 1:1 mapping of `DESIGN.md` tokens; zero runtime CSS-in-JS overhead; absolute styling control without utility baggage. | `PROPOSED — PENDING APPROVAL` |
-| **Animation Engine** | GSAP 3.x (core + ScrollTrigger) + CSS Transitions | Editorial-grade parallax, weighted scroll reveals; hardware-accelerated transforms; strict `prefers-reduced-motion` integration. | `PROPOSED — PENDING APPROVAL` |
-| **Typography Loading** | Geist via `next/font/google` (fallback: Inter) | Automated self-hosting, zero layout shift (size-adjust), preloaded weights 400/500 with stylistic sets `ss01, ss03, ss04`. | `PROPOSED — PENDING APPROVAL` |
-| **Asset Optimization** | Next.js Image Component (`next/image`) | Automated WebP/AVIF conversion, intrinsic aspect ratios, responsive `srcset`, priority LCP loading. | `PROPOSED — PENDING APPROVAL` |
-| **Icon Library** | Lucide React (or Heroicons) | Clean, uniform 1.5px/1.75px line glyphs matching Beau's restrained aesthetic. Strictly one icon set. | `[ICON LIBRARY] — PENDING APPROVAL` |
-| **Data Layer** | Local Static JSON Files (`src/data/`) | Zero database overhead, fully auditable in version control, human-editable, tamper-proof static builds. | `PROPOSED — PENDING APPROVAL` |
+| **Core Runtime / Framework** | Next.js 15 (App Router, React 19) | Native Static Site Generation (SSG), React Server Components (RSC) for zero-JS static content, built-in image & font optimization. | `USED` (next 15.5.27, react 19.3.0) |
+| **Language** | TypeScript 5.x | Strict end-to-end type safety mapping directly to `DATA_MODEL.md` schemas. | `USED` (5.9.3, strict + noUncheckedIndexedAccess) |
+| **Styling** | Vanilla CSS (CSS Custom Properties) | Direct 1:1 mapping of `docs/DESIGN.md` tokens; zero runtime CSS-in-JS overhead; absolute styling control without utility baggage. | `USED` |
+| **Animation Engine** | Native CSS transitions/keyframes + IntersectionObserver + rAF-throttled scroll listener | Editorial-grade parallax, weighted scroll reveals; hardware-accelerated transforms; strict `prefers-reduced-motion` integration. | `USED — GSAP REJECTED` (all documented patterns M/R/L implemented natively; zero animation dependencies) |
+| **Typography Loading** | Geist via `next/font/google` (fallback: Inter) | Automated self-hosting, zero layout shift (size-adjust), preloaded weights 400/500 with stylistic sets `ss01, ss03, ss04`. | `USED` |
+| **Asset Optimization** | Next.js Image Component (`next/image`) | Automated WebP/AVIF conversion, intrinsic aspect ratios, responsive `srcset`, priority LCP loading. | `USED` (wrapped by `SafeImage` with editorial fallback) |
+| **Icon Library** | Lucide React | Clean, uniform 1.75px line glyphs matching Beau's restrained aesthetic. Strictly one icon set. | `USED` (lucide-react 1.49.0) |
+| **Data Layer** | Local Static JSON Files (`src/data/`) + `src/lib/data.ts` | Zero database overhead, fully auditable in version control, human-editable, tamper-proof static builds. | `USED` (with PII firewall + consent filtering + referential integrity validation) |
 | **Hosting & Deployment** | Vercel / Cloudflare Pages / Static CDN | Ultra-fast global edge caching, zero server maintenance costs, instant immutable rollbacks. | `[DEPLOYMENT TARGET] — PENDING APPROVAL` |
+
+---
+
+### 2.2 Implemented Deviations from Original Proposal (per Execution Rule §30 — documented, not silent)
+
+| # | Original proposal | Implemented reality | Rationale |
+|---|-------------------|---------------------|-----------|
+| D1 | GSAP + ScrollTrigger for parallax/reveals | Native CSS + IntersectionObserver + rAF scroll listener | Authorization brief §03 mandates the native path unless documented motion is impossible natively; all M/R/L patterns are implemented natively. Zero animation dependencies. |
+| D2 | `useParallax` receives a ref from its parent | `ParallaxContainer` owns its ref internally | Keeps `HeroSection` a React Server Component (no `'use client'` needed for the text layer); only the photo layer is a client island. |
+| D3 | Scroll reveals via per-component wrappers | Single `ScrollReveal` client component observing every `[data-reveal]` node + CSS hidden states gated by an inline bootstrap (`data-reveal-ready`) | Reveals server-rendered content without making cards client components; no-JS and reduced-motion users never see hidden content. |
+| D4 | `validateDatabaseIntegrity` throws on unconsented references | Throws on **unknown** slugs; **filters** unconsented ones downstream | A student withdrawing consent must never break the build (DATA_MODEL §3.2 privacy rule); unknown slugs remain fatal typos. |
+| D5 | Empty `photo`/`coverImage` fail schema validation | Treated as "use documented fallback" | ARCHITECTURE §8.1 defines designed fallbacks (monogram, typographic cover) for exactly these cases; rejecting them would make fallbacks unreachable. |
+| D6 | App structure shows `hooks/` with parallax + reveal hooks | Kept 1:1 (`useReducedMotion`, `useInView`, `useParallax`) | Matches the documented structure; `useInView` is used by the reveal system's API surface. |
 
 ---
 
@@ -75,50 +91,51 @@
 │
 ├── src/                                   ← PROPOSED: Application source code
 │   ├── app/                               ← Next.js App Router (SSG Pages)
-│   │   ├── layout.tsx                     ← Root layout: Geist font, SiteHeader, SiteFooter
-│   │   ├── page.tsx                       ← Home / Landing: Hero, Identity, Highlights, Closing
-│   │   ├── not-found.tsx                  ← Editorial 404 page
-│   │   ├── sitemap.ts                     ← Automated static sitemap generator
-│   │   ├── robots.ts                      ← Robots.txt generator
+│   │   ├── layout.tsx                     ← Root layout: Geist font, SiteHeader, SiteFooter (T-201)
+│   │   ├── page.tsx                       ← Home / Landing: Complete narrative assembly (T-606)
+│   │   ├── not-found.tsx                  ← Editorial 404 page (T-205)
+│   │   ├── sitemap.ts                     ← Automated static sitemap generator (T-704)
+│   │   ├── robots.ts                      ← Robots.txt generator (T-704)
 │   │   ├── students/
-│   │   │   ├── page.tsx                   ← Student Directory (full grid)
+│   │   │   ├── page.tsx                   ← Student Directory (full grid) (T-405)
 │   │   │   └── [slug]/
-│   │   │       └── page.tsx               ← Individual Student Profile (SSG)
+│   │   │       └── page.tsx               ← Individual Student Profile (SSG) (T-404)
 │   │   ├── projects/
-│   │   │   ├── page.tsx                   ← Project Showcase index
+│   │   │   ├── page.tsx                   ← Project Showcase index (T-504)
 │   │   │   └── [slug]/
-│   │   │       └── page.tsx               ← Individual Project Detail (SSG)
+│   │   │       └── page.tsx               ← Individual Project Detail (SSG) (T-503)
 │   │   ├── memories/
 │   │   │   └── page.tsx                   ← Campus life photo stories & gallery
 │   │   ├── events/
-│   │   │   └── page.tsx                   ← Events & gatherings archive
+│   │   │   └── page.tsx                   ← Events & gatherings archive (T-602)
 │   │   └── timeline/
-│   │       └── page.tsx                   ← Chronological journey (2022–2026)
+│   │       └── page.tsx                   ← Chronological journey (2022–2026) (T-604)
 │   │
 │   ├── components/                        ← Strict 4-tier component architecture
-│   │   ├── foundation/                    ← Primitives: Typography, Button, Container, etc.
-│   │   ├── content/                       ← Data-driven cards, grids, lists
-│   │   ├── experience/                    ← Interactive layers: Lightbox, Parallax, Reveal
-│   │   └── layout/                        ← Header, Footer, Hero, NavDrawer
+│   │   ├── foundation/                    ← Primitives: Typography, Button, Container, etc. (T-105..T-111)
+│   │   ├── content/                       ← Data-driven cards, grids, lists (T-402, T-502, T-506A, etc.)
+│   │   ├── experience/                    ← Interactive layers: Lightbox (T-506B), Parallax, Reveal
+│   │   └── layout/                        ← Header, Footer, Hero, NavDrawer (T-202, T-204, T-301)
 │   │
 │   ├── styles/                            ← Vanilla CSS architecture
-│   │   ├── tokens.css                     ← CSS Custom Properties from DESIGN.md
-│   │   ├── reset.css                      ← Modern CSS reset
+│   │   ├── tokens.css                     ← CSS Custom Properties from docs/DESIGN.md (T-102)
+│   │   ├── reset.css                      ← Modern CSS reset (T-103)
 │   │   ├── typography.css                 ← Font scale and tracking utilities
 │   │   ├── layout.css                     ← Grid, container, and section gap classes
 │   │   └── globals.css                    ← Base styles, focus rings, root variables
 │   │
 │   ├── data/                              ← Static JSON data sources
 │   │   ├── class.json                     ← Cohort metadata and identity
-│   │   ├── students.json                  ← Array of Student records
-│   │   ├── projects.json                  ← Array of Project records
-│   │   ├── events.json                    ← Array of Event records
-│   │   ├── memories.json                  ← Array of Memory & photo records
-│   │   ├── achievements.json              ← Array of verified Achievement records
-│   │   └── timeline.json                  ← Array of Timeline milestones
+│   │   ├── students.json                  ← Array of Student records (T-401)
+│   │   ├── projects.json                  ← Array of Project records (T-501)
+│   │   ├── events.json                    ← Array of Event records (T-601)
+│   │   ├── memories.json                  ← Array of Memory records (T-505)
+│   │   ├── campus.json                    ← Array of CampusPhoto records (T-505)
+│   │   ├── achievements.json              ← Array of verified Achievement records (T-601)
+│   │   └── timeline.json                  ← Array of Timeline milestones (T-601)
 │   │
-│   ├── lib/                               ← Pure helper functions
-│   │   ├── data.ts                        ← Type-safe data accessors & validators
+│   ├── lib/                               ← Pure helper functions & data access layer
+│   │   ├── data.ts                        ← Type-safe data accessors, validators & consent filters (T-112)
 │   │   ├── utils.ts                       ← Classname formatting and shared helpers
 │   │   └── constants.ts                   ← Navigation links and metadata constants
 │   │
@@ -142,19 +159,15 @@
 
 | Route | Page Title | SSG Data Source | Key UI Components | Route Decision Status |
 |-------|------------|-----------------|-------------------|-----------------------|
-| `/` | STI 2026 — Sistem dan Teknologi Informasi | `class.json`, highlights from other files | `HeroSection`, `ClassIdentity`, `FeaturedStudents`, `FeaturedProjects`, `ClosingSection` | CONFIRMED |
-| `/students` | Angkatan — Mahasiswa STI 2026 | `students.json` | `StudentGrid`, `StudentCard`, Filter/Search bar | CONFIRMED |
-| `/students/[slug]` | `[Student Name] — STI 2026` | `students.json` (filtered by slug) | `StudentProfile`, `ProjectCard`, `SocialLinks` | `PROPOSED (Full Page SSG) — PENDING APPROVAL` |
-| `/projects` | Karya — Proyek STI 2026 | `projects.json` | `ProjectShowcase`, `ProjectCard` | CONFIRMED |
-| `/projects/[slug]` | `[Project Title] — Proyek STI 2026` | `projects.json` (filtered by slug) | `ProjectDetail`, `GradientFrame`, `TeamList` | `PROPOSED (Full Page SSG) — PENDING APPROVAL` |
-| `/memories` | Kenangan & Kehidupan Kampus | `memories.json` | `GalleryGrid`, `MemoryCard`, `GalleryLightbox` | CONFIRMED |
-| `/events` | Acara & Dokumentasi Angkatan | `events.json` | `EventList`, `EventCard` | CONFIRMED |
-| `/timeline` | Perjalanan STI 2026 (2022–2026) | `timeline.json` | `TimelineView`, `TimelineEntry` | CONFIRMED |
-| `/*` (404) | Halaman Tidak Ditemukan | None (static) | Editorial 404 message, return link | CONFIRMED |
-
-### 4.1 Route Decision Note: Full Page vs Modal
-- **Student Profile:** Proposed as a dedicated full-page SSG route (`/students/[slug]`) rather than an in-page modal to provide permanent, shareable URLs for student resumes, LinkedIn posts, and professional portfolios.
-- **Project Detail:** Proposed as a full-page SSG route (`/projects/[slug]`) to allow comprehensive case-study presentation with multiple screenshots and external links.
+| `/` | STI 2026 — Sistem dan Teknologi Informasi | `class.json`, `students.json`, `projects.json` via `src/lib/data.ts` | `HeroSection`, `ClassIdentity`, `FeaturedStudents`, `FeaturedProjects`, `ClosingSection` | CONFIRMED (T-606) |
+| `/students` | Angkatan — Mahasiswa STI 2026 | `students.json` | `StudentGrid`, `StudentCard`, Filter/Search bar | CONFIRMED (T-405) |
+| `/students/[slug]` | `[Student Name] — STI 2026` | `students.json` (filtered by slug) | `StudentProfile`, `ProjectCard`, `SocialLinks` | `PROPOSED (Full Page SSG) — PENDING APPROVAL` (T-404) |
+| `/projects` | Karya — Proyek STI 2026 | `projects.json` | `ProjectShowcase`, `ProjectCard` | CONFIRMED (T-504) |
+| `/projects/[slug]` | `[Project Title] — Proyek STI 2026` | `projects.json` (filtered by slug) | `ProjectDetail`, `GradientFrame`, `TeamList` | `PROPOSED (Full Page SSG) — PENDING APPROVAL` (T-503) |
+| `/memories` | Kenangan & Kehidupan Kampus | `memories.json`, `campus.json` | `GalleryGrid`, `MemoryCard`, `GalleryLightbox` | CONFIRMED (T-506A, T-506B) |
+| `/events` | Acara & Dokumentasi Angkatan | `events.json` | `EventList`, `EventCard` | CONFIRMED (T-602) |
+| `/timeline` | Perjalanan STI 2026 (2022–2026) | `timeline.json` | `TimelineView`, `TimelineEntry` | CONFIRMED (T-604) |
+| `/*` (404) | Halaman Tidak Ditemukan | None (static) | Editorial 404 message, return link to `/` | CONFIRMED (T-205) |
 
 ---
 
@@ -163,7 +176,7 @@
 To prevent circular dependencies and spaghetti imports, components follow a strict **unidirectional 4-layer dependency model**:
 
 ```text
-Layer 1: FOUNDATION (Design Tokens & Primitives)
+Layer 1: FOUNDATION (Design Tokens, Primitives, Data Access Layer)
       ↓ (can only be imported by Content, Experience, Layout)
 Layer 2: CONTENT (Data-Driven Cards, Grids, Lists)
       ↓ (can only be imported by Layout & Pages)
@@ -178,40 +191,6 @@ Layer 4: LAYOUT & PAGES (Route Assembly)
 - **Rule 3:** Experience components are pure interaction wrappers (Client Components); they accept `children` or primitives.
 - **Rule 4:** Server Components are the default. Client Components (`'use client'`) are strictly restricted to interactive nodes (Lightbox, Mobile Drawer, Parallax Hook).
 
-### 5.2 Layer Breakdown
-
-#### Layer 1: Foundation Primitives (`src/components/foundation/`)
-- `Typography`: Strict type scale renderer (`display`, `heading-lg`, `heading`, `heading-sm`, `subheading`, `body`, `caption`). Enforces Geist font features.
-- `Container`: Centered 1200px max-width layout wrapper with responsive horizontal padding.
-- `Section`: Vertical rhythm block enforcing 72px spacing and surface color switching (`paper-white`, `warm-parchment`, `ink-black`, `broadcast-gradient`).
-- `Button`: Pill-shaped interactive element (200px radius) with `filled` and `ghost` variants.
-- `Badge`: 200px radius pill for metadata tags, roles, and technology indicators.
-- `Image`: Safe wrapper around `next/image` enforcing 6px border-radius, aspect-ratio containment, and fallback handling.
-- `GradientFrame`: 3px outer Broadcast Gradient ring wrapping featured content.
-
-#### Layer 2: Content Blocks (`src/components/content/`)
-- `StudentCard`: Portrait photo, name, nickname, interest badges, and link to profile.
-- `StudentGrid`: Responsive 4/3/2/1-column grid.
-- `StudentProfile`: Full biographical view with linked projects and social links.
-- `ProjectCard`: Cover image, title, team member avatars/names, tech stack badges.
-- `ProjectDetail`: Full case-study presentation with media carousel and live links.
-- `MemoryCard`: Curated photograph with editorial caption and date metadata.
-- `GalleryGrid`: Masonry or balanced photo grid.
-- `EventCard`: Chronological event entry with date, poster, and summary.
-- `TimelineEntry`: Milestone block with date, description, and connector node.
-- `TimelineView`: Vertical journey track (alternating desktop, single-column mobile).
-
-#### Layer 3: Experience Layer (`src/components/experience/`)
-- `ParallaxContainer`: Client component providing rAF-throttled scroll offset to hero photography on desktop.
-- `ScrollReveal`: Intersection Observer wrapper applying subtle upward translation and fade.
-- `GalleryLightbox`: Accessible full-screen modal viewer with touch-swipe and keyboard arrow navigation.
-- `NavDrawer`: Slide-in mobile navigation with focus trapping and ESC key support.
-
-#### Layer 4: Layout & Assembled Pages (`src/components/layout/` & `src/app/`)
-- `SiteHeader`: Sticky 72px navigation header with wordmark, links, and mobile toggle.
-- `SiteFooter`: Editorial conclusion with program attribution, copyright, and verified links.
-- `HeroSection`: Full-viewport editorial hero assembling photography, typography, and CTA.
-
 ---
 
 ## 6. DATA ARCHITECTURE & FLOW
@@ -220,9 +199,11 @@ Layer 4: LAYOUT & PAGES (Route Assembly)
 [Static JSON in src/data/]
            │
            ▼
-[Type-Safe Data Accessor (src/lib/data.ts)]
-  • Validates JSON structure against TypeScript interfaces
+[Type-Safe Data Access Layer (src/lib/data.ts — T-112)]
+  • Validates JSON structure against TypeScript interfaces (DATA_MODEL.md)
   • Filters out unconsented records (consentPublic !== true)
+  • Suppresses all private PII (NIM, phone, address, grades)
+  • Handles fallbacks for missing/empty fields
   • Sorts chronologically (events, timeline, achievements)
            │
            ▼
@@ -234,11 +215,6 @@ Layer 4: LAYOUT & PAGES (Route Assembly)
            ▼
 [Static HTML + Pre-optimized WebP/AVIF Images]
 ```
-
-### 6.1 Data Validation Rules
-1. Every data read passes through `src/lib/data.ts`.
-2. Any Student record where `consentPublic !== true` is silently excluded from all queries and static page generation.
-3. Every referenced image path is checked at build time; missing images trigger designed editorial fallbacks rather than crashing the build.
 
 ---
 
@@ -271,12 +247,6 @@ public/images/
   - Gallery / Campus Photo: `< 200 KB` (AVIF/WebP)
   - Vector Icons: `< 5 KB` (SVG)
 
-### 7.3 Responsive Image Breakpoints
-All `next/image` invocations must provide explicit `sizes` attributes:
-- Student Cards: `sizes="(max-width: 430px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 280px"`
-- Project Cards: `sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"`
-- Hero Image: `sizes="100vw" priority`
-
 ---
 
 ## 8. FALLBACK & ERROR ARCHITECTURE
@@ -291,16 +261,16 @@ All `next/image` invocations must provide explicit `sizes` attributes:
 | **Student Quote Missing** | Quote block is completely hidden. |
 
 ### 8.2 Error Pages
-- **404 Not Found (`src/app/not-found.tsx`):**
+- **404 Not Found (`src/app/not-found.tsx` — T-205):**
   - Background: Warm Parchment (`#f6f4f1`).
-  - Typography: Geist 500 56px "404", Geist 400 17px editorial copy ("Halaman ini tidak ditemukan atau telah diarsipkan ke tempat lain.").
+  - Typography: Geist 500 56px "404", Geist 500 20px "Halaman Tidak Ditemukan", Geist 400 17px editorial copy ("Halaman yang Anda tuju tidak ditemukan atau telah diarsipkan ke tempat lain.").
   - Navigation: Single filled pill button returning user to `/`.
 
 ---
 
 ## 9. DEPLOYMENT & HOSTING SPECIFICATION
 
-- **Current Status:** `[DEPLOYMENT TARGET] — PENDING APPROVAL`
+- **Current Status:** Vercel-ready (standard SSG build; zero runtime secrets; `NEXT_PUBLIC_SITE_URL` optional for canonical/OG URLs)
 - **Build Mode:** Static Site Generation (`output: 'export'` or standard Vercel serverless SSG).
 - **Build Command:** `npm run build`
 - **Output Directory:** `.next` (or `out/` for static export).

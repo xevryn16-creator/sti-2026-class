@@ -7,13 +7,14 @@
 ## 1. REPOSITORY STATUS & AUDIT GOVERNANCE
 
 > [!IMPORTANT]
-> - **CURRENT REPOSITORY STATE: Documentation Phase Only.**
-> - No `package.json` exists in the repository; zero npm packages have been downloaded or installed.
+> - **CURRENT REPOSITORY STATE: Implementation Phase (Phases 1–6 complete).**
+> - `package.json` exists; the approved stack is installed and audited (see §2 and the manifest in §5).
 > - **Status Classification System:**
 >   - `PROPOSED`: Architected and recommended; pending user confirmation before installation.
 >   - `CONFIRMED`: User has formally approved the dependency.
 >   - `USED`: Package has been installed, added to `package.json`, and audited in code.
-> - **Verification Mandate:** All entries below are currently `PROPOSED`. Once Phase 1 commences, each package must undergo formal license verification (`npx license-checker`) upon installation.
+>   - `REJECTED`: Evaluated and deliberately not installed.
+> - **Verification Method:** Versions resolved from the installed lockfile; licenses verified against upstream repositories (all MIT / Apache-2.0 / ISC / OFL-1.1 — commercial use permitted, no UI attribution required).
 
 ---
 
@@ -26,8 +27,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Package** | `next` |
-| **Proposed Version** | 15.x (latest stable) |
-| **Status** | `PROPOSED — PENDING APPROVAL` |
+| **Installed Version** | 15.5.27 |
+| **Status** | `USED` |
 | **Upstream Source** | https://github.com/vercel/next.js |
 | **Stated License** | MIT License |
 | **Commercial Use Permitted** | Yes |
@@ -42,8 +43,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Package** | `react`, `react-dom` |
-| **Proposed Version** | 19.x (bundled with Next.js 15) |
-| **Status** | `PROPOSED — PENDING APPROVAL` |
+| **Installed Version** | 19.3.0 (`react`, `react-dom`) |
+| **Status** | `USED` |
 | **Upstream Source** | https://github.com/facebook/react |
 | **Stated License** | MIT License |
 | **Commercial Use Permitted** | Yes |
@@ -58,8 +59,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Package** | `typescript` (devDependency) |
-| **Proposed Version** | 5.x |
-| **Status** | `PROPOSED — PENDING APPROVAL` |
+| **Installed Version** | 5.9.3 |
+| **Status** | `USED` |
 | **Upstream Source** | https://github.com/microsoft/TypeScript |
 | **Stated License** | Apache License 2.0 |
 | **Commercial Use Permitted** | Yes |
@@ -74,8 +75,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Asset** | Geist Font Family (Weights 400 & 500) |
-| **Delivery Method** | `next/font/google` (pre-hosted & self-contained) |
-| **Status** | `PROPOSED — PENDING APPROVAL` |
+| **Delivery Method** | `next/font/google` — self-hosted at build time, preloaded weights 400/500, zero runtime roundtrips |
+| **Status** | `USED` |
 | **Creator / Copyright** | Vercel Inc. |
 | **Stated License** | SIL Open Font License 1.1 (OFL-1.1) |
 | **Commercial Use Permitted** | Yes |
@@ -90,8 +91,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Package** | `gsap` |
-| **Proposed Version** | 3.x |
-| **Status** | `PROPOSED — PENDING APPROVAL` |
+| **Decision** | **NOT INSTALLED** |
+| **Status** | `REJECTED` — every documented motion pattern (M-01..M-05, R-01..R-03, L-01..L-04) is implemented with native CSS transitions/keyframes, IntersectionObserver, and a rAF-throttled scroll listener. Adding GSAP would violate the minimal-dependency policy without a functional gain |
 | **Upstream Source** | https://github.com/greensock/GSAP |
 | **Stated License** | GSAP Standard "No Charge" GreenSock License |
 | **Commercial Use Permitted** | Yes (under Standard License for websites that don't charge multiple end-users for access) |
@@ -112,7 +113,8 @@
 | Attribute | Specification |
 |-----------|---------------|
 | **Package** | `lucide-react` |
-| **Status** | `PROPOSED (RECOMMENDED) — PENDING APPROVAL` |
+| **Installed Version** | 1.49.0 |
+| **Status** | `USED` — sole icon library; stroke width normalized to 1.75px in code |
 | **Upstream Source** | https://github.com/lucide-icons/lucide |
 | **License** | ISC License (Extremely permissive, functionally equivalent to MIT) |
 | **Attribution Required** | No |
@@ -160,7 +162,21 @@
 
 | Decision ID | Item | Options | Recommendation | Status |
 |-------------|------|---------|----------------|--------|
-| **L1** | Icon System Selection | Lucide vs Heroicons vs Phosphor | **Lucide React** (ISC, 1.5px stroke, minimalist) | `[ICON LIBRARY] — PENDING APPROVAL` |
-| **L2** | Geist Font Delivery | `next/font/google` vs npm `geist` | `next/font/google` (automated self-hosting, OFL) | `PROPOSED — PENDING APPROVAL` |
-| **L3** | GSAP Standard License | Standard free vs CSS-only motion | **Standard Free GSAP** (ScrollTrigger included; no paid plugins) | `PROPOSED — PENDING APPROVAL` |
-| **L4** | License Audit Command | Post-install CI verification | Run `npx license-checker --production --summary` | `PLANNED FOR PHASE 1` |
+| **L1** | Icon System Selection | Lucide vs Heroicons vs Phosphor | **Lucide React** (ISC, 1.75px stroke, minimalist) | `USED` |
+| **L2** | Geist Font Delivery | `next/font/google` vs npm `geist` | `next/font/google` (automated self-hosting, OFL) | `USED` |
+| **L3** | GSAP Standard License | Standard free vs CSS-only motion | **CSS-only motion** (native transitions + IntersectionObserver + rAF) | `RESOLVED — GSAP REJECTED` |
+| **L4** | License Audit Command | Post-install CI verification | License audit executed manually against the lockfile and upstream licenses (manifest below); `npx license-checker --production --summary` recommended for CI | `EXECUTED (manual)` |
+
+---
+
+## 5. INSTALLED DEPENDENCY MANIFEST (verified from lockfile)
+
+| Package | Version | License | Role |
+|---------|---------|---------|------|
+| `next` | 15.5.27 | MIT | App framework (App Router, SSG, next/font, next/image) |
+| `react` / `react-dom` | 19.3.0 | MIT | UI runtime |
+| `typescript` (dev) | 5.9.3 | Apache-2.0 | Static typing (strict mode) |
+| `lucide-react` | 1.49.0 | ISC | Icon system (drawer, close, chevrons) |
+| `@types/node` / `@types/react` / `@types/react-dom` (dev) | latest | MIT | Type definitions |
+
+No other runtime dependencies are installed. Total first-load JS: ~103 kB shared across all routes.
