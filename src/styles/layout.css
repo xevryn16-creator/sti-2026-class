@@ -1,0 +1,135 @@
+/* ============================================================
+   STI 2026 — Layout primitives (T-106, T-107)
+   ============================================================ */
+
+.container {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  /* 96px desktop / 48px tablet-landscape / 32px tablet / 24px mobile-lg / 20px mobile-sm */
+  padding-inline: 96px;
+}
+
+@media (max-width: 1279px) {
+  .container {
+    padding-inline: 48px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .container {
+    padding-inline: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 429px) {
+  .container {
+    padding-inline: 20px;
+  }
+}
+
+/* Section rhythm: 72px vertical block with surface variants (T-107) */
+.section {
+  padding-block: var(--section-gap);
+}
+
+.section--paper-white {
+  background-color: var(--color-paper-white);
+}
+
+.section--warm-parchment {
+  background-color: var(--color-warm-parchment);
+}
+
+.section--ink-black {
+  background-color: var(--color-ink-black);
+  color: var(--color-paper-white);
+}
+
+/* The single permitted Broadcast Gradient section wash (V-TOK-02) */
+.section--broadcast {
+  background-image: var(--gradient-broadcast);
+  color: var(--color-paper-white);
+}
+
+/* Section heading stack — docs/DESIGN.md §4.8 */
+.section-heading-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  margin-bottom: var(--spacing-24);
+}
+
+.section-heading-stack--center {
+  align-items: center;
+  text-align: center;
+}
+
+.section-kicker {
+  font-size: var(--text-caption);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-soft-graphite);
+}
+
+.section-subhead {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-soft-graphite);
+  max-width: 60ch;
+}
+
+.section-heading-stack--center .section-subhead {
+  margin-inline: auto;
+}
+
+/* Responsive grids shared by content components */
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-24);
+}
+
+@media (max-width: 1279px) {
+  .student-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1023px) {
+  .student-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 429px) {
+  .student-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-24);
+}
+
+@media (max-width: 1023px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}

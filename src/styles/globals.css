@@ -1,0 +1,88 @@
+/* ============================================================
+   STI 2026 — Global styles: entry point, focus, skip link,
+   reduced motion (T-103)
+   ============================================================ */
+
+@import "./reset.css";
+@import "./tokens.css";
+@import "./typography.css";
+@import "./layout.css";
+@import "../app/not-found.css";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper-white);
+  color: var(--color-ink-black);
+}
+
+/* Visible focus ring for all interactive elements (WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--color-ink-black);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.section--ink-black :focus-visible,
+.section--broadcast :focus-visible {
+  outline-color: var(--color-paper-white);
+}
+
+/* Skip link — first tab stop on every page */
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: var(--spacing-12);
+  z-index: calc(var(--z-lightbox) + 1);
+  padding: 12px 18px;
+  background-color: var(--color-ink-black);
+  color: var(--color-paper-white);
+  border-radius: var(--radius-buttons);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  transition: top var(--motion-fast) var(--ease-standard-out);
+}
+
+.skip-link:focus-visible {
+  top: var(--spacing-12);
+}
+
+/* Respect users who prefer reduced motion (docs/MOTION.md §4).
+   NOTE: reveal elements are exempt — visibility is JS-controlled below. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ScrollReveal base states (R-01..R-03, docs/MOTION.md).
+   Hidden state applies ONLY when JS is running and motion is allowed. */
+@media (scripting: enabled) {
+  html[data-reveal-ready="true"] [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  @media (max-width: 1023px) {
+    html[data-reveal-ready="true"] [data-reveal]:not(.is-revealed) {
+      transform: translateY(16px);
+    }
+  }
+}
+
+/* Once revealed, transition to full visibility with editorial easing */
+html[data-reveal-ready="true"] [data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--motion-slow) var(--ease-editorial-out),
+    transform var(--motion-slow) var(--ease-editorial-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}

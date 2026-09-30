@@ -1,0 +1,124 @@
+/* ============================================================
+   STI 2026 — Typography (T-103)
+   Type scale enforces docs/DESIGN.md §3.2 — weights 400/500 ONLY.
+   ============================================================ */
+
+body {
+  font-family: var(--font-geist);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: 400;
+  /* Geist stylistic sets: alternate single-storey 'a', geometric 'g', modernist '$' */
+  font-feature-settings: "ss01" on, "ss03" on, "ss04" on;
+}
+
+.t-display {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 500;
+}
+
+.t-heading-lg {
+  font-size: var(--text-heading-lg);
+  line-height: var(--leading-heading-lg);
+  letter-spacing: var(--tracking-heading-lg);
+  font-weight: 500;
+}
+
+.t-heading {
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  font-weight: 500;
+}
+
+.t-heading-sm {
+  font-size: var(--text-heading-sm);
+  line-height: var(--leading-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+  font-weight: 500;
+}
+
+.t-subheading {
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: 500;
+}
+
+.t-body {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: 400;
+}
+
+.t-caption {
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  letter-spacing: var(--tracking-caption);
+  font-weight: 400;
+}
+
+.t-caption-500 {
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+  letter-spacing: var(--tracking-caption);
+  font-weight: 500;
+}
+
+/* Responsive typography adjustments — docs/DESIGN.md §7 */
+@media (max-width: 1279px) {
+  .t-display {
+    font-size: 48px;
+  }
+
+  .t-heading-lg {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .t-display {
+    font-size: 40px;
+  }
+
+  .t-heading-lg {
+    font-size: 33px;
+  }
+}
+
+@media (max-width: 767px) {
+  .t-display {
+    font-size: 36px;
+  }
+
+  .t-heading-lg {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 429px) {
+  .t-display {
+    font-size: 33px;
+  }
+}
+
+/* Color utilities limited to the documented palette */
+.c-ink {
+  color: var(--color-ink-black);
+}
+
+.c-graphite {
+  color: var(--color-soft-graphite);
+}
+
+.c-ash {
+  color: var(--color-mid-ash);
+}
+
+.c-paper {
+  color: var(--color-paper-white);
+}
