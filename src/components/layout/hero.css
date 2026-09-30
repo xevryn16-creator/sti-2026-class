@@ -1,0 +1,136 @@
+/* ============================================================
+   STI 2026 — Hero styles (T-301..T-304)
+   ============================================================ */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--color-ink-black);
+  overflow: hidden;
+}
+
+/* Photograph layer — 130% height to allow parallax travel (L-01) */
+.hero__photo-layer {
+  position: absolute;
+  inset: 0;
+  height: 130%;
+  top: 0;
+  z-index: 1;
+}
+
+.hero__photo {
+  object-fit: cover;
+}
+
+/* Ink canvas + legibility scrim; used alone when no photo exists yet. */
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.28) 55%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+.hero__content {
+  position: relative;
+  z-index: 3;
+  padding-block: var(--spacing-96);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-18);
+  color: var(--color-paper-white);
+}
+
+.hero__kicker {
+  font-size: var(--text-subheading);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero__headline {
+  color: var(--color-paper-white);
+}
+
+.hero__subheadline {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  max-width: 52ch;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero__cta {
+  margin-top: var(--spacing-12);
+  background-color: var(--color-paper-white);
+  color: var(--color-ink-black);
+}
+
+.hero__cta:hover {
+  background-color: var(--color-warm-parchment);
+}
+
+/* Scroll cue — a quiet vertical hairline, not a bouncing arrow. */
+.hero__scrollcue {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  height: 56px;
+  z-index: 3;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7));
+}
+
+/* ---------- L-02 entrance (executes once on mount) ---------- */
+
+@media (scripting: enabled) {
+  html[data-reveal-ready="true"] .hero-entrance {
+    opacity: 0;
+    transform: translateY(32px);
+    animation: hero-in 700ms var(--ease-editorial-out) forwards;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  @media (max-width: 1023px) {
+    html[data-reveal-ready="true"] .hero-entrance {
+      transform: translateY(24px);
+    }
+  }
+
+  @media (max-width: 767px) {
+    html[data-reveal-ready="true"] .hero-entrance {
+      transform: translateY(16px);
+      animation-duration: 600ms;
+    }
+  }
+
+  html[data-reveal-ready="true"] .hero__subheadline.hero-entrance {
+    animation-duration: 600ms;
+  }
+
+  html[data-reveal-ready="true"] .hero__cta.hero-entrance {
+    animation-duration: 500ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reveal-ready="true"] .hero-entrance {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
