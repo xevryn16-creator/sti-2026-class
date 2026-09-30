@@ -1,0 +1,10 @@
+[
+  {
+    "id": "contoh-peran",
+    "label": "[CONTENT NEEDED]",
+    "studentId": "contoh-mahasiswa",
+    "period": "[CONTENT NEEDED]",
+    "division": "[CONTENT NEEDED]",
+    "_comment": "CONTOH STRUKTUR — salin untuk setiap peran resmi angkatan (Ketua Angkatan, Divisi Kominfo, dll). studentId harus merujuk mahasiswa dengan consentPublic: true."
+  }
+]

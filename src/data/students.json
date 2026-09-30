@@ -1,0 +1,9 @@
+[
+  {
+    "id": "contoh-mahasiswa",
+    "name": "[CONTENT NEEDED]",
+    "photo": "",
+    "consentPublic": false,
+    "_comment": "CONTOH STRUKTUR — jangan pernah dipublikasikan. Set consentPublic: true HANYA setelah mahasiswa menandatangani persetujuan publikasi (docs/CONTENT.md §2.2). Salin objek ini untuk setiap mahasiswa. Field 'photo' wajib diisi path seperti /images/students/<slug>-portrait.webp; monogram fallback tampil otomatis bila foto kosong."
+  }
+]
