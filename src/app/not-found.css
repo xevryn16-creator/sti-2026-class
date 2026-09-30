@@ -1,0 +1,20 @@
+/* ============================================================
+   STI 2026 — Editorial 404
+   ============================================================ */
+
+.not-found__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-18);
+  min-height: 60svh;
+  justify-content: center;
+}
+
+.not-found__code {
+  color: var(--color-ink-black);
+}
+
+.not-found__copy {
+  max-width: 46ch;
+}
