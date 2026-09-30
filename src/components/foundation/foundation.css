@@ -1,0 +1,152 @@
+/* ============================================================
+   STI 2026 — Foundation component styles
+   Buttons (DESIGN §4.1), Badges (§4.2), GradientFrame (§4.4),
+   monogram fallback (§4.3), image fallback (ARCHITECTURE §8.1)
+   ============================================================ */
+
+/* ---------- Pill buttons (§4.1, M-01) ---------- */
+
+.btn-pill-filled,
+.btn-pill-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-6);
+  border-radius: var(--radius-buttons);
+  font-family: var(--font-geist);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  min-height: 44px; /* WCAG touch target */
+  padding: 12px 18px;
+  transition:
+    background-color 160ms ease-out,
+    color 160ms ease-out,
+    opacity 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.btn-pill-filled {
+  background-color: var(--color-ink-black);
+  color: var(--color-paper-white);
+  font-weight: 500;
+}
+
+.btn-pill-filled:hover {
+  background-color: #1a1a1a;
+}
+
+.btn-pill-filled:active {
+  transform: scale(0.98);
+}
+
+.btn-pill-ghost {
+  background: transparent;
+  color: var(--color-ink-black);
+  font-weight: 400;
+}
+
+.btn-pill-ghost:hover {
+  text-decoration: underline;
+  opacity: 0.75;
+}
+
+/* Hover lift is desktop pointer only (M-01) */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .btn-pill-filled:hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-pill-filled:hover,
+  .btn-pill-filled:active {
+    transform: none;
+  }
+}
+
+/* ---------- Badges (§4.2) ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-badges);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+  font-weight: 500;
+  line-height: 1;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.badge--default {
+  background-color: var(--color-warm-parchment);
+  color: var(--color-ink-black);
+}
+
+.badge--spotlight {
+  background-image: var(--gradient-broadcast);
+  color: var(--color-paper-white);
+  padding: 6px 14px;
+}
+
+/* ---------- GradientFrame (§4.4) ---------- */
+
+.gradient-frame {
+  border-radius: var(--radius-cards);
+  padding: 3px;
+  background-image: var(--gradient-broadcast);
+}
+
+.gradient-frame__inner {
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-paper-white);
+}
+
+/* ---------- Student monogram fallback (§4.3) ---------- */
+
+.monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  background-color: var(--color-warm-parchment);
+  border-radius: var(--radius-images);
+}
+
+.monogram__initials {
+  font-size: var(--text-heading);
+  font-weight: 500;
+  letter-spacing: var(--tracking-heading);
+  color: var(--color-ink-black);
+}
+
+/* ---------- SafeImage fallback (FB-06) ---------- */
+
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  background-color: var(--color-warm-parchment);
+  border-radius: var(--radius-images);
+  border: 1px solid var(--color-hairline);
+  padding: var(--spacing-24);
+}
+
+.image-fallback__text {
+  font-size: var(--text-caption);
+  color: var(--color-mid-ash);
+  text-align: center;
+}
+
+/* ---------- SafeImage radius ---------- */
+
+.safe-image {
+  border-radius: var(--radius-images);
+  object-fit: cover;
+}
