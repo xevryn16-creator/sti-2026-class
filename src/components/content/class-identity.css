@@ -1,0 +1,41 @@
+/* ============================================================
+   STI 2026 — Class identity & stats
+   ============================================================ */
+
+.class-identity__statement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+  max-width: 72ch;
+}
+
+.class-identity__text {
+  color: var(--color-ink-black);
+}
+
+.class-identity__motto {
+  color: var(--color-soft-graphite);
+  border-left: 3px solid var(--color-ink-black);
+  padding-left: var(--spacing-24);
+}
+
+.class-identity__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-24);
+  margin-top: var(--spacing-48);
+}
+
+.class-identity__stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-6);
+}
+
+.class-identity__stat-label {
+  color: var(--color-soft-graphite);
+}
+
+.class-identity__stat-value {
+  color: var(--color-ink-black);
+}

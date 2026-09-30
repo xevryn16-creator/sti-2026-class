@@ -1,0 +1,63 @@
+/* ============================================================
+   STI 2026 — Student profile page
+   ============================================================ */
+
+.student-profile {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) 1fr;
+  gap: var(--spacing-48);
+  align-items: start;
+}
+
+@media (max-width: 767px) {
+  .student-profile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-profile__media img,
+.student-profile__monogram {
+  width: 100%;
+  border-radius: var(--radius-images);
+}
+
+.student-profile__monogram {
+  aspect-ratio: 3 / 4;
+}
+
+.student-profile__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-18);
+}
+
+.student-profile__nickname {
+  color: var(--color-soft-graphite);
+  margin-top: calc(-1 * var(--spacing-6));
+}
+
+.student-profile__roles,
+.student-profile__interests,
+.student-profile__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+  list-style: none;
+}
+
+.student-profile__quote {
+  border-left: 3px solid var(--color-broadcast-gradient);
+  padding-left: var(--spacing-24);
+  color: var(--color-ink-black);
+}
+
+.student-profile__achievements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  max-width: 720px;
+}
+
+.student-profile .btn-pill-ghost {
+  align-self: flex-start;
+}

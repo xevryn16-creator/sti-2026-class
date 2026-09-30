@@ -1,0 +1,530 @@
+/* ============================================================
+   STI 2026 — Content component styles
+   StudentCard (§4.3), ProjectCard (§4.4), MemoryCard (§4.5),
+   EventCard, AchievementList, TimelineView (§4.6), Closing
+   ============================================================ */
+
+/* ---------- Student directory card (§4.3, M-03) ---------- */
+
+.student-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  overflow: hidden;
+  transition:
+    transform 240ms var(--ease-standard-out),
+    box-shadow 240ms var(--ease-standard-out),
+    border-color 240ms var(--ease-standard-out);
+}
+
+.student-card__media {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+
+.student-card__photo {
+  width: 100%;
+  height: 100%;
+}
+
+.student-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: 16px;
+}
+
+.student-card__name {
+  color: var(--color-ink-black);
+}
+
+.student-card__nickname {
+  color: var(--color-soft-graphite);
+}
+
+.student-card__interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-6);
+}
+
+/* M-03 hover — desktop pointer only */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .student-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+@media (max-width: 1023px) and (hover: hover) and (pointer: fine) {
+  .student-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-card:hover {
+    transform: none;
+    border-color: var(--color-ink-black);
+  }
+}
+
+/* ---------- Project card (§4.4, M-04) ---------- */
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  overflow: hidden;
+  transition:
+    transform 300ms var(--ease-standard-out),
+    box-shadow 300ms var(--ease-standard-out);
+}
+
+.project-card__media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--color-warm-parchment);
+}
+
+.project-card__media img {
+  transition: transform 300ms var(--ease-standard-out);
+}
+
+.project-card__media--typographic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-24);
+  border-top: 3px solid var(--color-broadcast-gradient);
+}
+
+.project-card__media--typographic p {
+  font-size: var(--text-subheading);
+  font-weight: 500;
+  text-align: center;
+  color: var(--color-ink-black);
+}
+
+.project-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  padding: var(--spacing-24);
+}
+
+.project-card__title {
+  color: var(--color-ink-black);
+}
+
+.project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6) var(--spacing-12);
+  color: var(--color-soft-graphite);
+  font-size: var(--text-caption);
+}
+
+.project-card__tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .project-card:hover .project-card__media img {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card:hover,
+  .project-card:hover .project-card__media img {
+    transform: none;
+  }
+}
+
+/* ---------- Memory / campus photo card (§4.5, M-05) ---------- */
+
+.memory-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0;
+  width: 100%;
+  cursor: zoom-in;
+  border-radius: var(--radius-cards);
+}
+
+.memory-card__media {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-images);
+  position: relative;
+}
+
+.memory-card__media img {
+  transition: transform 360ms var(--ease-standard-out), filter 360ms var(--ease-standard-out);
+}
+
+.memory-card__caption {
+  font-size: var(--text-caption);
+  color: var(--color-soft-graphite);
+}
+
+.memory-card__date {
+  color: var(--color-mid-ash);
+}
+
+.memory-card__activity {
+  position: absolute;
+  top: var(--spacing-12);
+  left: var(--spacing-12);
+  z-index: 1;
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .memory-card:hover .memory-card__media img {
+    transform: scale(1.04);
+    filter: brightness(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-card:hover .memory-card__media img {
+    transform: none;
+  }
+}
+
+/* ---------- Memory story block ---------- */
+
+.memory-story {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-18);
+  padding-block: var(--spacing-36);
+  border-top: 1px solid var(--color-hairline);
+}
+
+.memory-story:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.memory-story__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  max-width: 70ch;
+}
+
+.memory-story__meta {
+  display: flex;
+  gap: var(--spacing-12);
+  color: var(--color-mid-ash);
+  font-size: var(--text-caption);
+}
+
+.memory-story__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-24);
+}
+
+@media (max-width: 1023px) {
+  .memory-story__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .memory-story__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Gallery grid (campus candid) ---------- */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-24);
+}
+
+@media (max-width: 1023px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Event archive (FB-05 typographic fallback) ---------- */
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+  max-width: 760px;
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  padding: var(--spacing-24);
+}
+
+.event-card__media {
+  aspect-ratio: 4 / 3;
+  max-height: 320px;
+  overflow: hidden;
+  border-radius: var(--radius-images);
+}
+
+.event-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.event-card__date {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-mid-ash);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+}
+
+.event-card__description {
+  color: var(--color-soft-graphite);
+}
+
+.event-card__location {
+  font-size: var(--text-caption);
+  color: var(--color-mid-ash);
+}
+
+/* ---------- Achievements ---------- */
+
+.achievement-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-18);
+  max-width: 820px;
+}
+
+.achievement-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+  border-left: 3px solid var(--color-ink-black);
+  padding-left: var(--spacing-24);
+}
+
+.achievement-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.achievement-card__recipients {
+  color: var(--color-soft-graphite);
+}
+
+.achievement-card__recipients a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Timeline (§4.6, R-03) ---------- */
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin-inline: auto;
+  padding-block: var(--spacing-12);
+}
+
+/* Vertical track */
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 8px;
+  width: 2px;
+  background-color: var(--color-hairline);
+}
+
+@media (min-width: 768px) {
+  .timeline::before {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.timeline-entry {
+  position: relative;
+  padding-left: var(--spacing-36);
+  padding-bottom: var(--spacing-36);
+}
+
+@media (min-width: 768px) {
+  .timeline-entry {
+    width: 50%;
+    padding-left: 0;
+  }
+
+  /* Alternate left/right (§4.6) */
+  .timeline-entry:nth-child(odd) {
+    padding-right: var(--spacing-36);
+    text-align: right;
+  }
+
+  .timeline-entry:nth-child(even) {
+    margin-left: 50%;
+    padding-left: var(--spacing-36);
+  }
+
+  /* Nodes sit on the central track */
+  .timeline-entry::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-ink-black);
+    box-shadow: 0 0 0 3px var(--color-paper-white);
+  }
+
+  .timeline-entry:nth-child(odd)::after {
+    right: -6px;
+  }
+
+  .timeline-entry:nth-child(even)::after {
+    left: -6px;
+  }
+}
+
+.timeline-entry__node {
+  position: absolute;
+  top: 6px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--color-ink-black);
+  box-shadow: 0 0 0 3px var(--color-paper-white);
+}
+
+@media (min-width: 768px) {
+  .timeline-entry__node {
+    display: none;
+  }
+}
+
+.timeline-entry__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  padding: var(--spacing-24);
+}
+
+.timeline-entry__date {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-soft-graphite);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+}
+
+.timeline-entry__title {
+  color: var(--color-ink-black);
+}
+
+.timeline-entry__description {
+  color: var(--color-soft-graphite);
+}
+
+.timeline-entry__media {
+  margin-top: var(--spacing-12);
+  border-radius: var(--radius-images);
+  overflow: hidden;
+}
+
+/* R-03 horizontal entrance on desktop (CSS transform handled by reveal) */
+
+/* ---------- Closing / valedictory ---------- */
+
+.closing {
+  position: relative;
+  overflow: hidden;
+}
+
+.closing__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+  max-width: 68ch;
+}
+
+.closing__paragraph {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.closing__signoff {
+  margin-top: var(--spacing-12);
+  color: var(--color-paper-white);
+}
+
+.closing__media {
+  margin-top: var(--spacing-48);
+  border-radius: var(--radius-images);
+  overflow: hidden;
+}
+
+/* ---------- Empty & content-needed states ---------- */
+
+.empty-state {
+  color: var(--color-soft-graphite);
+  background-color: var(--color-warm-parchment);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  padding: var(--spacing-36);
+  max-width: 720px;
+}
+
+.content-needed {
+  color: var(--color-mid-ash);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-caption);
+}

@@ -1,0 +1,78 @@
+/* ============================================================
+   STI 2026 — Project detail page
+   ============================================================ */
+
+.project-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-18);
+}
+
+.project-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.project-detail__title {
+  color: var(--color-ink-black);
+}
+
+.project-detail__description {
+  max-width: 68ch;
+  color: var(--color-ink-black);
+}
+
+.project-detail__links {
+  display: flex;
+  gap: var(--spacing-12);
+}
+
+.project-detail__cover {
+  margin-top: var(--spacing-24);
+}
+
+.project-detail__cover-fallback {
+  border-radius: var(--radius-images);
+}
+
+.project-detail__gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-24);
+}
+
+@media (max-width: 767px) {
+  .project-detail__gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+.project-detail__team {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-12);
+}
+
+.project-detail__member {
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-cards);
+  background-color: var(--color-paper-white);
+}
+
+.project-detail__member-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-18);
+  min-height: 44px;
+}
+
+.project-detail__member-link:hover {
+  background-color: var(--color-warm-parchment);
+}
+
+.project-detail__member-role {
+  color: var(--color-soft-graphite);
+}

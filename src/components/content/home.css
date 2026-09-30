@@ -1,0 +1,9 @@
+/* ============================================================
+   STI 2026 — Homepage helpers
+   ============================================================ */
+
+.home__more {
+  margin-top: var(--spacing-36);
+  display: flex;
+  justify-content: center;
+}
