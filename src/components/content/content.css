@@ -528,3 +528,127 @@
   font-size: var(--text-caption);
   letter-spacing: var(--tracking-caption);
 }
+
+/* ---------- Directory controls & interactive filters (T-405, T-504) ---------- */
+
+.directory-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-36);
+}
+
+.directory-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  max-width: 840px;
+}
+
+.directory-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.directory-search__icon {
+  position: absolute;
+  left: 14px;
+  color: var(--color-soft-graphite);
+  pointer-events: none;
+}
+
+.directory-search__input {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 42px;
+  font-family: inherit;
+  font-size: var(--text-caption);
+  color: var(--color-ink-black);
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-buttons);
+  transition: border-color var(--motion-fast) var(--ease-standard-out);
+}
+
+.directory-search__input:focus {
+  outline: 2px solid var(--color-ink-black);
+  outline-offset: 1px;
+}
+
+.directory-search__clear {
+  position: absolute;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-soft-graphite);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.directory-search__clear:hover {
+  color: var(--color-ink-black);
+}
+
+.directory-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+}
+
+.directory-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-soft-graphite);
+  background-color: var(--color-paper-white);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-buttons);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-standard-out),
+    color var(--motion-fast) var(--ease-standard-out),
+    border-color var(--motion-fast) var(--ease-standard-out);
+}
+
+.directory-filter-btn:hover {
+  color: var(--color-ink-black);
+  border-color: var(--color-soft-graphite);
+}
+
+.directory-filter-btn--active {
+  background-color: var(--color-ink-black);
+  color: var(--color-paper-white);
+  border-color: var(--color-ink-black);
+}
+
+.directory-filter-btn--active:hover {
+  background-color: var(--color-ink-black);
+  color: var(--color-paper-white);
+  border-color: var(--color-ink-black);
+}
+
+.directory-meta {
+  color: var(--color-soft-graphite);
+}
+
+.directory-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-16);
+}
+
+.directory-empty__reset {
+  margin-top: var(--spacing-6);
+}
+

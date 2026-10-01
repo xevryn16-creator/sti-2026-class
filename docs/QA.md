@@ -212,15 +212,19 @@ Executed against the optimized production build (`next build` + `next start`, No
 | Check | Result | Notes |
 |-------|--------|-------|
 | TypeScript strict (`tsc --noEmit`) | PASS | zero errors, `noUncheckedIndexedAccess` on |
-| Production build | PASS | 11/11 routes prerendered (○ static, ● SSG) |
-| Route matrix | PASS | 6 pages + robots + sitemap = 200; unknown student/project slugs = 404 |
-| Consent filtering | PASS | `consentPublic !== true` never returned by `src/lib/data.ts`; PII keys abort the build |
+| Production build (`next build`) | PASS | 12/12 routes prerendered (including dynamic OpenGraph image) |
+| Automated QA Test Suite (`npm test`) | PASS | 36/36 tests passed across 7 test suites (PII firewall, referential integrity, HTML a11y, token compliance) |
+| Route matrix | PASS | 6 pages + robots + sitemap + opengraph-image = 200; unknown slugs = 404 |
+| Consent filtering | PASS | `consentPublic !== true` never returned by `src/lib/data.ts`; PII keys abort build/ingestion |
 | Zero fabricated data | PASS | all data files empty/template; sections render editorial empty states |
-| A11y tree (Chromium) | PASS | skip link, landmarks, single `h1`, labelled dialog, 44px targets |
+| Interactive search & filters | PASS | StudentDirectory & ProjectDirectory real-time filtering, dynamic count, reset |
+| Security headers (`next.config.ts`) | PASS | HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy |
+| A11y tree & semantic HTML | PASS | skip link, landmarks, single `h1` per page across all HTML files, 44px targets |
 | Lightbox keyboard suite | PASS | open, trap, arrows, ESC, focus restoration, scroll lock |
 | Nav drawer | PASS | open/close/ESC/scroll-lock/active route |
 | `prefers-reduced-motion` | PASS | reveals + parallax + drawer + lightbox motion suppressed via media queries & JS gate |
 | Metadata/sitemap/robots | PASS | unique titles/descriptions, canonical, OG tags, generated sitemap.xml |
+| OpenGraph social image | PASS | 1200×630px static OG card rendered via Next.js ImageResponse |
 | Lighthouse mobile audit | PENDING | requires deployed production URL |
 | Manual cross-browser matrix | PENDING | Chrome/Edge/Firefox/Safari real-device pass |
 | Screen-reader walkthrough | PENDING | NVDA/VoiceOver session |

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Container from "@/components/foundation/Container";
 import Section from "@/components/foundation/Section";
 import SectionHeading from "@/components/foundation/SectionHeading";
-import StudentGrid from "@/components/content/StudentGrid";
+import StudentDirectory from "@/components/content/StudentDirectory";
 import { getStudents } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo";
 
@@ -25,7 +25,7 @@ export default function StudentsPage() {
           headline="Angkatan"
           subhead="Individu-individu di balik STI 2026 — minat, peran, dan karya mereka."
         />
-        <StudentGrid students={students} />
+        <StudentDirectory students={students} />
       </Container>
     </Section>
   );

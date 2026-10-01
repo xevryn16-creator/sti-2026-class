@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Container from "@/components/foundation/Container";
 import Section from "@/components/foundation/Section";
 import SectionHeading from "@/components/foundation/SectionHeading";
-import ProjectCard from "@/components/content/ProjectCard";
+import ProjectDirectory from "@/components/content/ProjectDirectory";
 import { getProjects } from "@/lib/data";
 import { buildMetadata } from "@/lib/seo";
 
@@ -25,22 +25,7 @@ export default function ProjectsPage() {
           headline="Karya"
           subhead="Proyek akademik, kompetisi, dan independen yang dibangun angkatan."
         />
-        {projects.length === 0 ? (
-          <p className="empty-state t-body" role="status">
-            Etalase proyek sedang dikurasi — deskripsi, tim, dan visual akan
-            diterbitkan setelah verifikasi.
-          </p>
-        ) : (
-          <div className="project-grid">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                featured={project.featured}
-              />
-            ))}
-          </div>
-        )}
+        <ProjectDirectory projects={projects} />
       </Container>
     </Section>
   );
