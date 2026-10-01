@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireSession, requireRole } from "@/lib/cms/auth";
+import { authorize, requireSession } from "@/lib/cms/auth";
 import {
   getAllStudentsCMS,
   getStudentByIdCMS,
@@ -16,7 +15,9 @@ export async function getStudentsAction() {
 }
 
 export async function saveStudentAction(formData: FormData) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+  const session = auth.session;
 
   const id = (formData.get("id") as string) || `student-${Date.now()}`;
   const name = formData.get("name") as string;
@@ -52,23 +53,24 @@ export async function saveStudentAction(formData: FormData) {
     role: session.user.role,
   });
 
-  revalidatePath("/students");
-  revalidatePath("/admin/students");
-  revalidatePath("/admin/dashboard");
+  /*
+   * No `revalidatePath()` here on purpose: public routes are prerendered from
+   * build-inlined JSON, so revalidating them at runtime would silently do
+   * nothing (src/lib/cms/publish.ts). Publishing happens on the next build.
+   */
 
-  return { success: true, student: studentItem };
+  return { success: true as const, student: studentItem };
 }
 
 export async function deleteStudentAction(id: string) {
-  const session = await requireRole("admin"); // Only admin can delete student
+  // Non-throwing gate: a denied editor gets a message, not an error page.
+  const auth = await authorize("admin");
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await deleteStudentCMS(id, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/students");
-  revalidatePath("/admin/students");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true };
+  return { success: true as const };
 }

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getAllStudentsCMS } from "@/lib/cms/store";
 import { deleteStudentAction } from "@/app/admin/actions/students";
+import DeleteActionButton from "@/components/admin/DeleteActionButton";
 
 export default async function AdminStudentsPage() {
   const students = await getAllStudentsCMS();
@@ -11,8 +12,10 @@ export default async function AdminStudentsPage() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "1rem",
           marginBottom: "1.5rem",
         }}
       >
@@ -126,20 +129,11 @@ export default async function AdminStudentsPage() {
                       >
                         Edit
                       </Link>
-                      <form
-                        action={async () => {
-                          "use server";
-                          await deleteStudentAction(student.id);
-                        }}
-                      >
-                        <button
-                          type="submit"
-                          className="admin-btn admin-btn-danger"
-                          style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                        >
-                          Hapus
-                        </button>
-                      </form>
+                      <DeleteActionButton
+                        id={student.id}
+                        action={deleteStudentAction}
+                        confirmMessage={`Hapus data mahasiswa "${student.name}"? Tindakan ini tidak dapat dibatalkan.`}
+                      />
                     </div>
                   </td>
                 </tr>

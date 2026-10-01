@@ -43,7 +43,15 @@ describe("E2E Local System Integration Flow (docs/QA.md)", () => {
     );
   });
 
-  it("3. Verifies student lifecycle: Draft -> Hidden -> Published -> Visible -> Cleanup", async () => {
+  /*
+   * R1 (build-gated publication, docs/ADMIN.md §7): public routes are prerendered
+   * from JSON inlined at build time. Mutating src/data/*.json while a production
+   * server is running must NOT change what the public site serves until the next
+   * `npm run build` — the admin CMS surfaces this as the "PERLU BUILD" banner.
+   * These tests therefore assert the publish lifecycle against the *build
+   * snapshot*, not against live file edits.
+   */
+  it("3. Verifies build-gated lifecycle: Draft hidden -> Published stored but NOT public until rebuild -> Cleanup", async () => {
     const syntheticStudentId = "e2e-synthetic-test-student";
     const syntheticStudent = {
       id: syntheticStudentId,
@@ -87,28 +95,25 @@ describe("E2E Local System Integration Flow (docs/QA.md)", () => {
     target.publishStatus = "published";
     fs.writeFileSync(STUDENTS_FILE, JSON.stringify(updatedStudents, null, 2), "utf-8");
 
-    // Step E: Verify now VISIBLE on public directory
+    // Step E: Verify STILL hidden on public directory after publishing to the
+    // store — publication is build-gated, so no runtime JSON edit may leak
+    // through to the already-prerendered public site.
     const publicDirRes2 = await fetch(`${BASE_URL}/students`);
     assert.equal(publicDirRes2.status, 200);
     const publicHtml2 = await publicDirRes2.text();
     assert.equal(
       publicHtml2.includes("E2E Synthetic Student"),
-      true,
-      "Published student MUST appear on public directory /students",
+      false,
+      "Published student must NOT appear on public site until the next build (build-gated publication)",
     );
 
-    // Step F: Verify direct slug access succeeds with HTTP 200
+    // Step F: Verify direct slug also still serves the build snapshot (404),
+    // matching the draft behaviour — no partial runtime publication.
     const directSlugRes2 = await fetch(`${BASE_URL}/students/${syntheticStudentId}`);
     assert.equal(
       directSlugRes2.status,
-      200,
-      "Published student slug must return HTTP 200",
-    );
-    const directSlugHtml = await directSlugRes2.text();
-    assert.equal(
-      directSlugHtml.includes("E2E Synthetic Student"),
-      true,
-      "Direct slug page must contain student name",
+      404,
+      "Direct slug of a newly published student must remain 404 until the next build",
     );
 
     // Step G: Cleanup synthetic student

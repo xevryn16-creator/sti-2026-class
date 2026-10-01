@@ -17,6 +17,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Buku tahunan digital dan etalase karya mahasiswa Sistem dan Teknologi Informasi angkatan 2026.",
   path: "/",
+  // Homepage sits in the root segment: it must compose its own brand suffix.
+  absoluteTitle: true,
 });
 
 /**

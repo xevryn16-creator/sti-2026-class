@@ -9,3 +9,11 @@ next-env.d.ts
 .env.*
 !.env.example
 .DS_Store
+
+# CMS operational log — not a build input, never commit
+src/data/audit-logs.json
+
+# NOTE: src/data/media-assets.json and public/uploads/ are deliberately NOT
+# ignored. Under the local store they are publish inputs for the build-gated
+# static site (docs/ADMIN.md §7). Use Supabase Storage for cloud media instead
+# of committing large binaries.

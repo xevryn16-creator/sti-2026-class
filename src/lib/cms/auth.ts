@@ -1,89 +1,43 @@
 import { cookies } from "next/headers";
 import type { AdminSession, AdminUser, UserRole } from "@/types/cms";
+import {
+  SESSION_COOKIE_NAME,
+  SESSION_MAX_AGE_SEC,
+  isProductionSecretMissing,
+  signSession,
+  verifySession,
+} from "./session";
 
-const COOKIE_NAME = "sti_admin_session";
-const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 days
+export { signSession, verifySession };
+export { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SEC };
 
-// Environment credentials & secret key
-const SECRET_KEY = process.env.ADMIN_SESSION_SECRET ?? "sti2026-development-secret-key-32chars";
-
-// Derive HMAC key using Web Crypto (Edge & Node compatible)
-async function getCryptoKey(): Promise<CryptoKey> {
-  const enc = new TextEncoder();
-  return crypto.subtle.importKey(
-    "raw",
-    enc.encode(SECRET_KEY),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"],
-  );
-}
-
-function base64UrlEncode(str: string): string {
-  return Buffer.from(str)
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-}
-
-function base64UrlDecode(str: string): string {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) base64 += "=";
-  return Buffer.from(base64, "base64").toString("utf-8");
-}
-
-export async function signSession(session: AdminSession): Promise<string> {
-  const payloadStr = JSON.stringify(session);
-  const payloadB64 = base64UrlEncode(payloadStr);
-
-  const key = await getCryptoKey();
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(payloadB64),
-  );
-  const signatureB64 = Buffer.from(signature)
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-
-  return `${payloadB64}.${signatureB64}`;
-}
-
-export async function verifySession(token: string): Promise<AdminSession | null> {
-  try {
-    const [payloadB64, signatureB64] = token.split(".");
-    if (!payloadB64 || !signatureB64) return null;
-
-    const key = await getCryptoKey();
-    let sigStr = signatureB64.replace(/-/g, "+").replace(/_/g, "/");
-    while (sigStr.length % 4) sigStr += "=";
-    const sigBytes = Buffer.from(sigStr, "base64");
-
-    const valid = await crypto.subtle.verify(
-      "HMAC",
-      key,
-      sigBytes,
-      new TextEncoder().encode(payloadB64),
-    );
-    if (!valid) return null;
-
-    const session: AdminSession = JSON.parse(base64UrlDecode(payloadB64));
-    if (Date.now() > session.expiresAt) return null;
-
-    return session;
-  } catch {
-    return null;
-  }
-}
+const COOKIE_NAME = SESSION_COOKIE_NAME;
 
 export async function getSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
   return verifySession(token);
+}
+
+function buildSession(email: string, name: string, role: UserRole): AdminSession {
+  return {
+    user: { id: role === "admin" ? "admin-default" : "editor-default", email, name, role },
+    expiresAt: Date.now() + SESSION_MAX_AGE_SEC * 1000,
+  };
+}
+
+async function issueSession(session: AdminSession): Promise<void> {
+  const isProduction = process.env.NODE_ENV === "production";
+  const token = await signSession(session);
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
+    path: "/",
+    maxAge: SESSION_MAX_AGE_SEC,
+  });
 }
 
 export async function login(
@@ -93,34 +47,30 @@ export async function login(
   const cleanEmail = email.trim().toLowerCase();
   const isProduction = process.env.NODE_ENV === "production";
 
+  // Fail-safe: never issue sessions in production without an explicit
+  // signing secret — the development fallback secret is public knowledge.
+  if (isProductionSecretMissing()) {
+    console.error(
+      "[auth] ADMIN_SESSION_SECRET is not configured in production. Admin login is disabled.",
+    );
+    return {
+      success: false,
+      error: "Konfigurasi server belum lengkap. Hubungi administrator sistem.",
+    };
+  }
+
   // In production, require explicit environment credentials or Supabase Auth.
   // Never allow hardcoded development credentials in production.
   const adminEmail = process.env.ADMIN_EMAIL ?? process.env.ADMIN_DEFAULT_EMAIL ?? (isProduction ? undefined : "admin@sti2026.itb.ac.id");
   const adminPassword = process.env.ADMIN_PASSWORD ?? process.env.ADMIN_DEFAULT_PASSWORD ?? (isProduction ? undefined : "AdminSTI2026!Editorial");
 
   if (adminEmail && adminPassword && cleanEmail === adminEmail.toLowerCase() && pass === adminPassword) {
-    const user: AdminUser = {
-      id: "admin-default",
-      email: cleanEmail,
-      name: "Tim Administrator STI 2026",
-      role: (process.env.ADMIN_DEFAULT_ROLE as UserRole) ?? "admin",
-    };
-
-    const session: AdminSession = {
-      user,
-      expiresAt: Date.now() + SESSION_MAX_AGE_SEC * 1000,
-    };
-
-    const token = await signSession(session);
-    const cookieStore = await cookies();
-    cookieStore.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE_SEC,
-    });
-
+    const session = buildSession(
+      cleanEmail,
+      "Tim Administrator STI 2026",
+      (process.env.ADMIN_DEFAULT_ROLE as UserRole) ?? "admin",
+    );
+    await issueSession(session);
     return { success: true, session };
   }
 
@@ -129,28 +79,8 @@ export async function login(
   const editorPassword = process.env.EDITOR_PASSWORD ?? process.env.EDITOR_DEFAULT_PASSWORD ?? (isProduction ? undefined : "EditorSTI2026!Content");
 
   if (editorEmail && editorPassword && cleanEmail === editorEmail.toLowerCase() && pass === editorPassword) {
-    const user: AdminUser = {
-      id: "editor-default",
-      email: cleanEmail,
-      name: "Tim Redaksi STI 2026",
-      role: "editor",
-    };
-
-    const session: AdminSession = {
-      user,
-      expiresAt: Date.now() + SESSION_MAX_AGE_SEC * 1000,
-    };
-
-    const token = await signSession(session);
-    const cookieStore = await cookies();
-    cookieStore.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE_SEC,
-    });
-
+    const session = buildSession(cleanEmail, "Tim Redaksi STI 2026", "editor");
+    await issueSession(session);
     return { success: true, session };
   }
 
@@ -176,4 +106,44 @@ export async function requireRole(allowedRole: UserRole): Promise<AdminSession> 
     throw new Error("FORBIDDEN");
   }
   return session;
+}
+
+/* ------------------------------------------------------------------ */
+/* Non-throwing authorization (server actions)                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Indonesian, user-facing authorization messages.
+ *
+ * Server actions must never let a denied role surface as an unhandled
+ * exception (that renders the framework "Application error" page). They return
+ * one of these instead, so the admin UI can explain the refusal.
+ */
+export const AUTH_DENIED = {
+  unauthorized:
+    "Sesi Anda tidak ditemukan atau telah berakhir. Silakan masuk kembali untuk melanjutkan.",
+  forbidden:
+    "Akses ditolak: hanya akun dengan peran Administrator yang dapat menghapus data. Tindakan ini tidak dijalankan.",
+} as const;
+
+export type AuthorizationResult =
+  | { ok: true; session: AdminSession }
+  | { ok: false; error: string };
+
+/**
+ * Authorization that reports failure as data instead of throwing.
+ *
+ * Security semantics are identical to `requireSession()` / `requireRole()`:
+ * the gate is evaluated before any mutation, so a denied caller never reaches
+ * the store and therefore never produces an audit entry.
+ */
+export async function authorize(requiredRole?: UserRole): Promise<AuthorizationResult> {
+  const session = await getSession();
+  if (!session) {
+    return { ok: false, error: AUTH_DENIED.unauthorized };
+  }
+  if (requiredRole === "admin" && session.user.role !== "admin") {
+    return { ok: false, error: AUTH_DENIED.forbidden };
+  }
+  return { ok: true, session };
 }

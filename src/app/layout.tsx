@@ -3,7 +3,7 @@ import { Geist } from "next/font/google";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ScrollReveal from "@/components/experience/ScrollReveal";
-import { SITE_FULL_NAME } from "@/lib/constants";
+import { SITE_FULL_NAME, SITE_NAME } from "@/lib/constants";
 import "@/styles/globals.css";
 import "@/components/foundation/foundation.css";
 import "@/components/layout/layout.css";
@@ -28,10 +28,17 @@ export const metadata: Metadata = {
   ),
   title: {
     default: SITE_FULL_NAME,
-    template: "%s | STI 2026",
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     "Buku tahunan digital dan etalase karya mahasiswa Sistem dan Teknologi Informasi angkatan 2026.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     siteName: SITE_FULL_NAME,
     locale: "id_ID",

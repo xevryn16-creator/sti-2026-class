@@ -11,6 +11,9 @@ export const metadata: Metadata = {
       "Halaman yang Anda tuju tidak ditemukan atau telah diarsipkan ke tempat lain.",
     path: "/404",
   }),
+  // An error page must never advertise a canonical URL or be indexed.
+  alternates: undefined,
+  robots: { index: false, follow: true },
 };
 
 /**

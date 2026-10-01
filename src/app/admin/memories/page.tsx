@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getAllMemoriesCMS } from "@/lib/cms/store";
 import { deleteMemoryAction } from "@/app/admin/actions/memories";
+import DeleteActionButton from "@/components/admin/DeleteActionButton";
 
 export default async function AdminMemoriesPage() {
   const memories = await getAllMemoriesCMS();
@@ -11,8 +12,10 @@ export default async function AdminMemoriesPage() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "1rem",
           marginBottom: "1.5rem",
         }}
       >
@@ -103,20 +106,11 @@ export default async function AdminMemoriesPage() {
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-                        <form
-                          action={async () => {
-                            "use server";
-                            await deleteMemoryAction(memory.id);
-                          }}
-                        >
-                          <button
-                            type="submit"
-                            className="admin-btn admin-btn-danger"
-                            style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                          >
-                            Hapus
-                          </button>
-                        </form>
+                        <DeleteActionButton
+                          id={memory.id}
+                          action={deleteMemoryAction}
+                          confirmMessage={`Hapus kenangan "${memory.title}"? Tindakan ini tidak dapat dibatalkan.`}
+                        />
                       </div>
                     </td>
                   </tr>

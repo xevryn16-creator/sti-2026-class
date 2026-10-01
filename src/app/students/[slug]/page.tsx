@@ -25,7 +25,13 @@ export function generateStaticParams(): { slug: string }[] {
   return getStudents().map((s) => ({ slug: s.id }));
 }
 
-export const dynamicParams = false;
+/*
+ * `dynamicParams` intentionally stays at its default (`true`). With `false`,
+ * any student added after the build (i.e. through the CMS) rendered a card in
+ * the directory that linked to a hard 404 until the next rebuild. Unknown or
+ * unconsented slugs still 404 via `notFound()` below, so the consent firewall
+ * is unchanged (docs/QA.md F-STU-02/F-STU-05).
+ */
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;

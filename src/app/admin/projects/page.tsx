@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getAllProjectsCMS } from "@/lib/cms/store";
 import { deleteProjectAction } from "@/app/admin/actions/projects";
+import DeleteActionButton from "@/components/admin/DeleteActionButton";
 
 export default async function AdminProjectsPage() {
   const projects = await getAllProjectsCMS();
@@ -11,8 +12,10 @@ export default async function AdminProjectsPage() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "1rem",
           marginBottom: "1.5rem",
         }}
       >
@@ -110,20 +113,11 @@ export default async function AdminProjectsPage() {
                       >
                         Edit
                       </Link>
-                      <form
-                        action={async () => {
-                          "use server";
-                          await deleteProjectAction(project.id);
-                        }}
-                      >
-                        <button
-                          type="submit"
-                          className="admin-btn admin-btn-danger"
-                          style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                        >
-                          Hapus
-                        </button>
-                      </form>
+                      <DeleteActionButton
+                        id={project.id}
+                        action={deleteProjectAction}
+                        confirmMessage={`Hapus proyek "${project.title}"? Tindakan ini tidak dapat dibatalkan.`}
+                      />
                     </div>
                   </td>
                 </tr>

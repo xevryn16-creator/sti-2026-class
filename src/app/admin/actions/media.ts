@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireSession, requireRole } from "@/lib/cms/auth";
+import { authorize, requireSession } from "@/lib/cms/auth";
 import { uploadMediaFile } from "@/lib/cms/media";
 import {
   getAllMediaCMS,
@@ -15,16 +14,18 @@ export async function getMediaAction() {
 }
 
 export async function uploadMediaAction(formData: FormData) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+  const session = auth.session;
 
   const file = formData.get("file") as File | null;
   if (!file) {
-    return { success: false, error: "Berkas tidak ditemukan." };
+    return { success: false as const, error: "Berkas tidak ditemukan." };
   }
 
   const result = await uploadMediaFile(file, session.user.email);
   if (!result.success) {
-    return { success: false, error: result.error };
+    return { success: false as const, error: result.error };
   }
 
   await saveMediaAssetCMS(result.asset, {
@@ -32,21 +33,19 @@ export async function uploadMediaAction(formData: FormData) {
     role: session.user.role,
   });
 
-  revalidatePath("/admin/media");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true, asset: result.asset };
+  /* Uploaded binaries land in public/uploads and join the next build
+     (src/lib/cms/publish.ts) — the admin UI states this explicitly. */
+  return { success: true as const, asset: result.asset };
 }
 
 export async function deleteMediaAction(id: string) {
-  const session = await requireRole("admin");
+  const auth = await authorize("admin");
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await deleteMediaAssetCMS(id, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/admin/media");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true };
+  return { success: true as const };
 }

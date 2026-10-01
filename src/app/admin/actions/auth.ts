@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { login, logout, getSession } from "@/lib/cms/auth";
+import { sanitizeAdminRedirect } from "@/lib/cms/redirect";
 
 export async function loginAction(
   prevState: { error?: string } | undefined,
@@ -9,7 +10,8 @@ export async function loginAction(
 ): Promise<{ error?: string }> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const redirectTo = (formData.get("redirectTo") as string) || "/admin/dashboard";
+  // Same-origin sanitization: prevents post-login open redirects.
+  const redirectTo = sanitizeAdminRedirect(formData.get("redirectTo") as string | null);
 
   if (!email || !password) {
     return { error: "Email dan kata sandi wajib diisi." };

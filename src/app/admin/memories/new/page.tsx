@@ -20,7 +20,11 @@ export default function NewMemoryPage() {
       const res = await saveMemoryAction(formData);
       if (res.success) {
         router.push("/admin/memories");
+        return;
       }
+      // Refusals (expired session / insufficient role) surface as a message.
+      setError(res.error ?? "Cerita kenangan gagal disimpan.");
+      setSubmitting(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan.");
       setSubmitting(false);
@@ -40,6 +44,7 @@ export default function NewMemoryPage() {
 
       {error && (
         <div
+          role="alert"
           style={{
             backgroundColor: "#fdeded",
             color: "#5f2120",

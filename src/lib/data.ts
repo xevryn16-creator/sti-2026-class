@@ -26,6 +26,7 @@ import eventsData from "@/data/events.json";
 import memoriesData from "@/data/memories.json";
 import achievementsData from "@/data/achievements.json";
 import timelineData from "@/data/timeline.json";
+import { BANNED_PII_KEYS } from "./pii";
 
 import type {
   AchievementEntity,
@@ -43,19 +44,6 @@ import type {
 /* ------------------------------------------------------------------ */
 /* PII firewall                                                        */
 /* ------------------------------------------------------------------ */
-
-const BANNED_PII_KEYS = [
-  "phone",
-  "address",
-  "nim",
-  "gpa",
-  "email",
-  "whatsapp",
-  "telegram",
-  "discord",
-  "transcript",
-  "grade",
-] as const;
 
 function assertNoBannedKeys(record: Record<string, unknown>, source: string): void {
   for (const key of BANNED_PII_KEYS) {
@@ -411,6 +399,11 @@ const ALL_TIMELINE: TimelineEntryEntity[] = RAW_TIMELINE.map(
       description: assertOptionalString(t.description, "description", source),
       image: assertOptionalString(t.image, "image", source),
       category: assertOptionalString(t.category, "category", source) as TimelineEntryEntity["category"],
+      /* MUST be carried through: `getTimeline()` filters on it, so dropping
+         this field silently published every draft/archived entry (QA §4). */
+      publishStatus:
+        (assertOptionalString(t.publishStatus, "publishStatus", source) as TimelineEntryEntity["publishStatus"]) ??
+        "published",
     };
   },
 );

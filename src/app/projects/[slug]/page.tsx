@@ -18,7 +18,11 @@ export function generateStaticParams(): { slug: string }[] {
   return getProjects().map((p) => ({ slug: p.id }));
 }
 
-export const dynamicParams = false;
+/*
+ * `dynamicParams` intentionally stays at its default (`true`) so a project
+ * published through the CMS after the build is reachable without a rebuild.
+ * Unknown or unpublished slugs still 404 via `notFound()` in the page body.
+ */
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;

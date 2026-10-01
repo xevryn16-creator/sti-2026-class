@@ -12,7 +12,9 @@ export default function StudentForm({
   initialData?: CMSStudentItem;
 }) {
   const router = useRouter();
-  const [consent, setConsent] = useState(initialData?.consentPublic ?? true);
+  // Consent must be an EXPLICIT opt-in (docs/CONTENT.md §2.2): a new record is
+  // never pre-consented, so an untouched form can never leak a student.
+  const [consent, setConsent] = useState(initialData?.consentPublic ?? false);
   const [publishStatus, setPublishStatus] = useState(initialData?.publishStatus ?? "published");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,11 @@ export default function StudentForm({
       const res = await saveStudentAction(formData);
       if (res.success) {
         router.push("/admin/students");
+        return;
       }
+      // Authorization/validation refusal reported as data, never as a crash page.
+      setError(res.error ?? "Data mahasiswa gagal disimpan.");
+      setSubmitting(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan saat menyimpan data.");
       setSubmitting(false);
@@ -50,6 +56,7 @@ export default function StudentForm({
 
       {error && (
         <div
+          role="alert"
           style={{
             backgroundColor: "#fdeded",
             color: "#5f2120",

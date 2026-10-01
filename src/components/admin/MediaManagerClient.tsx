@@ -42,11 +42,17 @@ export default function MediaManagerClient({
 
   const handleDelete = async (id: string) => {
     if (!confirm("Hapus berkas media ini? Tindakan ini tidak dapat dibatalkan.")) return;
+    setUploadError(null);
     try {
-      await deleteMediaAction(id);
+      const res = await deleteMediaAction(id);
+      if (res && res.success === false) {
+        // Permission refusal (RBAC) is reported to the editor, not thrown.
+        setUploadError(res.error ?? "Berkas media gagal dihapus.");
+        return;
+      }
       setMedia(media.filter((m) => m.id !== id));
     } catch {
-      alert("Gagal menghapus berkas media.");
+      setUploadError("Berkas media gagal dihapus. Silakan muat ulang halaman dan coba lagi.");
     }
   };
 
@@ -108,6 +114,7 @@ export default function MediaManagerClient({
 
       {uploadError && (
         <div
+          role="alert"
           style={{
             backgroundColor: "#fdeded",
             color: "#5f2120",

@@ -32,6 +32,17 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  experimental: {
+    // Media uploads run through Server Actions. Next.js defaults to a 1 MB
+    // request body, which silently caps uploads far below the documented
+    // limits (10 MB images / 50 MB video) and rejects them with an opaque 413.
+    serverActions: {
+      bodySizeLimit: "60mb",
+    },
+    // `/admin/*` is middleware-matched, so the request is buffered there too
+    // (Next.js caps that at 10 MB by default, truncating larger uploads).
+    middlewareClientMaxBodySize: "60mb",
+  },
   async headers() {
     return [
       {

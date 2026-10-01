@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireSession, requireRole } from "@/lib/cms/auth";
+import { authorize, requireSession } from "@/lib/cms/auth";
 import {
   getAllMemoriesCMS,
   saveMemoryCMS,
@@ -15,7 +14,9 @@ export async function getMemoriesAction() {
 }
 
 export async function saveMemoryAction(formData: FormData) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+  const session = auth.session;
 
   const id = (formData.get("id") as string) || `memory-${Date.now()}`;
   const title = formData.get("title") as string;
@@ -49,23 +50,19 @@ export async function saveMemoryAction(formData: FormData) {
     role: session.user.role,
   });
 
-  revalidatePath("/memories");
-  revalidatePath("/admin/memories");
-  revalidatePath("/admin/dashboard");
+  /* Public routes are build-gated (src/lib/cms/publish.ts); no runtime revalidation. */
 
-  return { success: true, memory: memoryItem };
+  return { success: true as const, memory: memoryItem };
 }
 
 export async function deleteMemoryAction(id: string) {
-  const session = await requireRole("admin");
+  const auth = await authorize("admin");
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await deleteMemoryCMS(id, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/memories");
-  revalidatePath("/admin/memories");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true };
+  return { success: true as const };
 }

@@ -33,7 +33,11 @@ export default function ProjectForm({
       const res = await saveProjectAction(formData);
       if (res.success) {
         router.push("/admin/projects");
+        return;
       }
+      // Authorization/validation refusal reported as data, never as a crash page.
+      setError(res.error ?? "Data proyek gagal disimpan.");
+      setSubmitting(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan saat menyimpan data.");
       setSubmitting(false);
@@ -53,6 +57,7 @@ export default function ProjectForm({
 
       {error && (
         <div
+          role="alert"
           style={{
             backgroundColor: "#fdeded",
             color: "#5f2120",

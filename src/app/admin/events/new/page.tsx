@@ -21,7 +21,11 @@ export default function NewEventPage() {
       const res = await saveEventAction(formData);
       if (res.success) {
         router.push("/admin/events");
+        return;
       }
+      // Refusals (expired session / insufficient role) surface as a message.
+      setError(res.error ?? "Agenda kegiatan gagal disimpan.");
+      setSubmitting(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan.");
       setSubmitting(false);
@@ -41,6 +45,7 @@ export default function NewEventPage() {
 
       {error && (
         <div
+          role="alert"
           style={{
             backgroundColor: "#fdeded",
             color: "#5f2120",

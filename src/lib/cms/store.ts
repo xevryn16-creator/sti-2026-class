@@ -21,6 +21,7 @@ import type {
   TimelineEntryEntity,
 } from "@/types";
 import { getSupabaseAdminClient, isSupabaseConfigured } from "./supabase";
+import { findBannedPiiKey } from "@/lib/pii";
 
 const DATA_DIR = path.join(process.cwd(), "src", "data");
 
@@ -162,13 +163,12 @@ export async function saveStudentCMS(
   student: CMSStudentItem,
   actor: { email: string; role: "admin" | "editor" }
 ): Promise<CMSStudentItem> {
-  // PII verification
-  const banned = ["phone", "address", "nim", "gpa", "whatsapp", "telegram"];
-  const rawObj = student as unknown as Record<string, unknown>;
-  for (const b of banned) {
-    if (b in rawObj) {
-      throw new Error(`Violates PII policy: field '${b}' is strictly prohibited.`);
-    }
+  // PII verification (docs/CONTENT.md §2.1) — full documented key set, deep scan.
+  const piiHit = findBannedPiiKey(student as unknown);
+  if (piiHit) {
+    throw new Error(
+      `Violates PII policy: field '${piiHit}' is strictly prohibited and must never be stored.`,
+    );
   }
 
   const isNew = !(await getStudentByIdCMS(student.id));

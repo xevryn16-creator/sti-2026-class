@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireSession, requireRole } from "@/lib/cms/auth";
+import { authorize, requireSession } from "@/lib/cms/auth";
 import {
   getAllProjectsCMS,
   getProjectByIdCMS,
@@ -17,7 +16,9 @@ export async function getProjectsAction() {
 }
 
 export async function saveProjectAction(formData: FormData) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+  const session = auth.session;
 
   const id = (formData.get("id") as string) || `project-${Date.now()}`;
   const title = formData.get("title") as string;
@@ -63,23 +64,19 @@ export async function saveProjectAction(formData: FormData) {
     role: session.user.role,
   });
 
-  revalidatePath("/projects");
-  revalidatePath("/admin/projects");
-  revalidatePath("/admin/dashboard");
+  /* Public routes are build-gated (src/lib/cms/publish.ts); no runtime revalidation. */
 
-  return { success: true, project: projectItem };
+  return { success: true as const, project: projectItem };
 }
 
 export async function deleteProjectAction(id: string) {
-  const session = await requireRole("admin");
+  const auth = await authorize("admin");
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await deleteProjectCMS(id, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/projects");
-  revalidatePath("/admin/projects");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true };
+  return { success: true as const };
 }

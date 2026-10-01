@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { requireSession, requireRole } from "@/lib/cms/auth";
+import { authorize, requireSession } from "@/lib/cms/auth";
 import {
   getAllEventsCMS,
   saveEventCMS,
@@ -18,7 +17,9 @@ export async function getEventsAction() {
 }
 
 export async function saveEventAction(formData: FormData) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+  const session = auth.session;
 
   const id = (formData.get("id") as string) || `event-${Date.now()}`;
   const title = formData.get("title") as string;
@@ -45,25 +46,21 @@ export async function saveEventAction(formData: FormData) {
     role: session.user.role,
   });
 
-  revalidatePath("/events");
-  revalidatePath("/admin/events");
-  revalidatePath("/admin/dashboard");
+  /* Public routes are build-gated (src/lib/cms/publish.ts); no runtime revalidation. */
 
-  return { success: true, event: eventItem };
+  return { success: true as const, event: eventItem };
 }
 
 export async function deleteEventAction(id: string) {
-  const session = await requireRole("admin");
+  const auth = await authorize("admin");
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await deleteEventCMS(id, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/events");
-  revalidatePath("/admin/events");
-  revalidatePath("/admin/dashboard");
-
-  return { success: true };
+  return { success: true as const };
 }
 
 export async function getTimelineAction() {
@@ -72,13 +69,14 @@ export async function getTimelineAction() {
 }
 
 export async function saveTimelineAction(entry: CMSTimelineItem) {
-  const session = await requireSession();
+  const auth = await authorize();
+  if (!auth.ok) return { success: false as const, error: auth.error };
+
   await saveTimelineCMS(entry, {
-    email: session.user.email,
-    role: session.user.role,
+    email: auth.session.user.email,
+    role: auth.session.user.role,
   });
 
-  revalidatePath("/timeline");
-  revalidatePath("/admin/events");
-  return { success: true };
+  /* Public routes are build-gated (src/lib/cms/publish.ts); no runtime revalidation. */
+  return { success: true as const };
 }

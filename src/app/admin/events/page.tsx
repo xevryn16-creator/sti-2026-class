@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getAllEventsCMS, getAllTimelineCMS } from "@/lib/cms/store";
 import { deleteEventAction } from "@/app/admin/actions/events";
+import DeleteActionButton from "@/components/admin/DeleteActionButton";
 
 export default async function AdminEventsPage() {
   const events = await getAllEventsCMS();
@@ -12,8 +13,10 @@ export default async function AdminEventsPage() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "1rem",
           marginBottom: "1.5rem",
         }}
       >
@@ -96,20 +99,11 @@ export default async function AdminEventsPage() {
                         </span>
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        <form
-                          action={async () => {
-                            "use server";
-                            await deleteEventAction(event.id);
-                          }}
-                        >
-                          <button
-                            type="submit"
-                            className="admin-btn admin-btn-danger"
-                            style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                          >
-                            Hapus
-                          </button>
-                        </form>
+                        <DeleteActionButton
+                          id={event.id}
+                          action={deleteEventAction}
+                          confirmMessage={`Hapus kegiatan "${event.title}"? Tindakan ini tidak dapat dibatalkan.`}
+                        />
                       </td>
                     </tr>
                   ))}

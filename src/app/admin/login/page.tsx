@@ -3,10 +3,11 @@
 import React, { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/admin/actions/auth";
+import { sanitizeAdminRedirect } from "@/lib/cms/redirect";
 
 export default function AdminLoginPage() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/admin/dashboard";
+  const redirectTo = sanitizeAdminRedirect(searchParams.get("redirect"));
 
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
 

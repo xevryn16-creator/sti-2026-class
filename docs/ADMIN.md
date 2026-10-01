@@ -147,3 +147,51 @@ npm run typecheck
 npm run build
 ```
 Semua perintah di atas diverifikasi **100% PASS** tanpa error.
+
+---
+
+## 7. Model Publikasi (Build-Gated)
+
+Situs publik STI 2026 adalah **publikasi statis** (docs/ARCHITECTURE.md §9): halaman
+publik meng-import `src/data/*.json` pada saat **build**, sama seperti aset statis
+lainnya. CMS menyimpan perubahan editorial seketika, tetapi situs publik baru berubah
+setelah **build berikutnya** dijalankan dan di-deploy.
+
+### 7.1 Implikasi operasional
+
+| Tindakan di CMS | Efek pada situs publik |
+| --- | --- |
+| Menyimpan / mengubah / menghapus data | Tersimpan seketika di CMS; publik **belum** berubah |
+| Mengunggah berkas media | Berkas masuk ke `public/uploads/`; publik **belum** menyajikannya |
+| `npm run build` + deploy | Seluruh perubahan (termasuk media) menjadi tayang |
+
+Konsekuensinya, `revalidatePath()` **tidak dipakai** untuk rute publik: data sudah
+di-inline saat build sehingga revalidasi runtime tidak akan menerbitkan apa pun.
+Klaim palsu semacam itu dihindari; sebagai gantinya UI CMS menampilkan status
+publikasi yang sebenarnya melalui `src/lib/cms/publish.ts`
+(`pending-rebuild` / `in-sync` / `development`).
+
+### 7.2 Status publikasi di UI CMS
+
+Setiap halaman CMS menampilkan satu banner status:
+
+- **Perubahan menunggu build & deploy** — ada berkas konten yang lebih baru daripada
+  build terakhir (`.next/BUILD_ID`). Jalankan `npm run build`, lalu deploy ulang.
+- **Situs publik sesuai build terakhir** — tidak ada perubahan yang tertunda.
+- **Mode pengembangan** — `next dev` memuat data terbaru secara langsung; perilaku
+  build-gated hanya berlaku pada build produksi.
+
+Status ini dihitung dari mtime berkas konten dibandingkan waktu build, sehingga selalu
+akurat tanpa perlu pencatatan manual.
+
+### 7.3 Media
+
+- **Driver lokal:** berkas di `public/uploads/` adalah **input build**, sehingga harus
+  ikut ter-commit/ter-deploy agar muncul di situs publik (karena itu
+  `src/data/media-assets.json` dan `public/uploads/` tidak di-ignore oleh git).
+- **Produksi (disarankan):** gunakan **Supabase Storage** agar URL media bersifat publik
+  dan tidak perlu menyimpan biner di repositori.
+- `src/data/audit-logs.json` bersifat operasional (bukan input build) dan di-ignore.
+
+> Mode Supabase pada `src/lib/cms/store.ts` tetap kompatibel: perubahan tetap tercatat
+> dan build berikutnya mengambil data dari sumber yang sama.
