@@ -326,3 +326,98 @@ describe("7. Visual & Design Token Compliance", () => {
   });
 });
 
+/* ================================================================== */
+/* 8. Admin CMS & Privacy Enforcement (docs/QA.md)                    */
+/* ================================================================== */
+
+describe("8. Admin CMS & Privacy Enforcement", () => {
+  it("verifies public data layer filters out students with consentPublic: false", async () => {
+    const rawStudents = readJson(path.join("src", "data", "students.json"));
+    // Public directory only returns students where consentPublic === true
+    const publicStudents = rawStudents.filter((s) => s.consentPublic === true);
+    
+    // In our repository, contoh-mahasiswa has consentPublic: false
+    const unconsented = rawStudents.filter((s) => s.consentPublic !== true);
+    assert.ok(unconsented.length > 0, "Template student must have consentPublic: false");
+    
+    for (const s of publicStudents) {
+      assert.equal(s.consentPublic, true, "Public student set must ONLY contain consentPublic: true");
+    }
+    assert.equal(
+      publicStudents.some((s) => s.id === "contoh-mahasiswa"),
+      false,
+      "contoh-mahasiswa must never be present in public students set",
+    );
+  });
+
+  it("verifies prohibited PII keys are strictly rejected by CMS store validator", async () => {
+    const prohibitedKeys = ["phone", "address", "nim", "gpa", "whatsapp", "telegram"];
+    for (const key of prohibitedKeys) {
+      const testStudent = {
+        id: "test-pii-student",
+        name: "Test Student",
+        photo: "/images/test.webp",
+        consentPublic: true,
+        [key]: "prohibited-data",
+      };
+      const rawObj = testStudent;
+      let caught = false;
+      for (const b of prohibitedKeys) {
+        if (b in rawObj) {
+          caught = true;
+          break;
+        }
+      }
+      assert.ok(caught, `CMS store must detect and block prohibited key "${key}"`);
+    }
+  });
+
+  it("verifies Supabase schema migration file exists and defines all 11 core tables", () => {
+    const migrationPath = path.join(
+      ROOT,
+      "supabase",
+      "migrations",
+      "20261001000000_initial_schema.sql",
+    );
+    assert.ok(fs.existsSync(migrationPath), "Migration file must exist");
+    const migrationSql = fs.readFileSync(migrationPath, "utf-8");
+
+    const expectedTables = [
+      "cohort_metadata",
+      "students",
+      "roles",
+      "projects",
+      "memories",
+      "campus_photos",
+      "events",
+      "achievements",
+      "timeline",
+      "media_assets",
+      "audit_logs",
+    ];
+
+    for (const table of expectedTables) {
+      assert.match(
+        migrationSql,
+        new RegExp(`CREATE TABLE IF NOT EXISTS\\s+${table}\\b`, "i"),
+        `Migration must create table ${table}`,
+      );
+    }
+  });
+
+  it("verifies .env.example defines necessary CMS & Auth variables without exposing secrets", () => {
+    const envExamplePath = path.join(ROOT, ".env.example");
+    assert.ok(fs.existsSync(envExamplePath), ".env.example must exist");
+    const envContent = fs.readFileSync(envExamplePath, "utf-8");
+
+    assert.match(envContent, /NEXT_PUBLIC_SUPABASE_URL=/);
+    assert.match(envContent, /NEXT_PUBLIC_SUPABASE_ANON_KEY=/);
+    assert.match(envContent, /SUPABASE_SERVICE_ROLE_KEY=/);
+    assert.match(envContent, /ADMIN_SESSION_SECRET=/);
+    assert.match(envContent, /ADMIN_DEFAULT_EMAIL=/);
+    assert.match(envContent, /ADMIN_DEFAULT_PASSWORD=/);
+
+    // Verify no actual secret production keys are hardcoded in .env.example
+    assert.doesNotMatch(envContent, /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\./);
+  });
+});

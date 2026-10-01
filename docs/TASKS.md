@@ -861,3 +861,95 @@
 **IMPLEMENTATION NOTES:** Final manual inspection of every JSON record against consent forms.  
 **ACCEPTANCE CRITERIA:** Formal written sign-off from STI 2026 class committee; zero data leaks.  
 **TEST REQUIREMENTS:** Dual-auditor data verification.
+
+---
+
+## 11. PHASE 9 — ADMIN PANEL & CONTENT MANAGEMENT SYSTEM (CMS)
+
+---
+
+**ID:** T-901  
+**TITLE:** Implement Server-Side Admin Authentication & Session Management  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Secure `/admin` with HMAC-SHA256 Web Crypto session signing, HTTP-only cookies, and Next.js middleware guards.  
+**FILES/AREA:** `src/lib/cms/auth.ts`, `src/middleware.ts`, `src/app/admin/actions/auth.ts`, `src/app/admin/login/page.tsx`  
+**ACCEPTANCE CRITERIA:** Unauthorized `/admin` requests redirect to login; expired/invalid sessions blocked; zero client-only auth bypass.  
+**TEST REQUIREMENTS:** `npm test` & typecheck pass.
+
+---
+
+**ID:** T-902  
+**TITLE:** Build Admin CMS Dashboard & Content Readiness Checklist  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Provide editorial staff with real metrics on cohort directory, projects, memories, events, media count, and audit readiness checklist.  
+**FILES/AREA:** `src/app/admin/dashboard/page.tsx`, `src/lib/cms/store.ts`  
+**ACCEPTANCE CRITERIA:** Metrics calculated from actual store data; no fake statistics; real-time checklist for hero image, student consent, and catalogues.  
+**TEST REQUIREMENTS:** `npm run build` succeeds; dynamic dashboard renders cleanly.
+
+---
+
+**ID:** T-903  
+**TITLE:** Implement Student Directory Management & Consent Firewall Controls  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** End-to-end CRUD for student profiles with strict consent firewall and PII enforcement.  
+**FILES/AREA:** `src/app/admin/students/*`, `src/components/admin/StudentForm.tsx`, `src/app/admin/actions/students.ts`  
+**ACCEPTANCE CRITERIA:** Unconsented students (`consentPublic: false`) trigger UI warnings and are never exposed publicly; prohibited PII (phone, address, nim, gpa) blocked on submit.  
+**TEST REQUIREMENTS:** `npm test` Suite 8.
+
+---
+
+**ID:** T-904  
+**TITLE:** Implement Project & Inventions Catalog CMS  
+**PRIORITY:** P1  
+**STATUS:** DONE  
+**PURPOSE:** Full CRUD for student projects, team member validation, categories, tech tags, and featured showcase toggles.  
+**FILES/AREA:** `src/app/admin/projects/*`, `src/components/admin/ProjectForm.tsx`, `src/app/admin/actions/projects.ts`  
+**ACCEPTANCE CRITERIA:** Validates student member references; manages draft/publish/archive states; revalidates public project pages on change.  
+**TEST REQUIREMENTS:** Typecheck & build pass.
+
+---
+
+**ID:** T-905  
+**TITLE:** Implement Memories & Photo Stories CMS  
+**PRIORITY:** P1  
+**STATUS:** DONE  
+**PURPOSE:** Manage narrative photo memories, semester periods, and event stories.  
+**FILES/AREA:** `src/app/admin/memories/*`, `src/app/admin/actions/memories.ts`  
+**ACCEPTANCE CRITERIA:** Photo stories persisted with captions and alt texts; draft/publish workflow supported.  
+**TEST REQUIREMENTS:** Typecheck & build pass.
+
+---
+
+**ID:** T-906  
+**TITLE:** Implement Events & Timeline Milestones CMS  
+**PRIORITY:** P1  
+**STATUS:** DONE  
+**PURPOSE:** Manage cohort events, academic ceremonies, and semester milestone entries.  
+**FILES/AREA:** `src/app/admin/events/*`, `src/app/admin/actions/events.ts`  
+**ACCEPTANCE CRITERIA:** Supports dates, locations, categories, and published state; updates public event calendars upon save.  
+**TEST REQUIREMENTS:** Typecheck & build pass.
+
+---
+
+**ID:** T-907  
+**TITLE:** Build Media Library with Upload Validation & EXIF Stripping  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Provide centralized media asset management with MIME checks, size limits, Sharp EXIF metadata removal, and WebP optimization.  
+**FILES/AREA:** `src/lib/cms/media.ts`, `src/app/admin/media/*`, `src/components/admin/MediaManagerClient.tsx`  
+**ACCEPTANCE CRITERIA:** Images > 10MB or videos > 50MB rejected; GPS/EXIF stripped for privacy; URL copying and deletion supported.  
+**TEST REQUIREMENTS:** `npm run build` succeeds.
+
+---
+
+**ID:** T-908  
+**TITLE:** Database Migrations & Supabase Architecture Integration  
+**PRIORITY:** P0  
+**STATUS:** DONE  
+**PURPOSE:** Implement 11 PostgreSQL relational tables with RLS and hybrid local JSON fallback.  
+**FILES/AREA:** `supabase/migrations/20261001000000_initial_schema.sql`, `src/lib/cms/supabase.ts`, `.env.example`, `docs/ADMIN.md`  
+**ACCEPTANCE CRITERIA:** Migration SQL creates all tables cleanly; local dev works without cloud credentials; production connects seamlessly.  
+**TEST REQUIREMENTS:** `npm test` Suite 8 verifies schema migration and .env.example.
