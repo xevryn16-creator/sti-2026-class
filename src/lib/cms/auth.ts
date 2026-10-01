@@ -125,8 +125,8 @@ export async function login(
   }
 
   // Check editor account (development or if explicitly set in env)
-  const editorEmail = process.env.EDITOR_DEFAULT_EMAIL ?? (isProduction ? undefined : "editor@sti2026.itb.ac.id");
-  const editorPassword = process.env.EDITOR_DEFAULT_PASSWORD ?? (isProduction ? undefined : "EditorSTI2026!Content");
+  const editorEmail = process.env.EDITOR_EMAIL ?? process.env.EDITOR_DEFAULT_EMAIL ?? (isProduction ? undefined : "editor@sti2026.itb.ac.id");
+  const editorPassword = process.env.EDITOR_PASSWORD ?? process.env.EDITOR_DEFAULT_PASSWORD ?? (isProduction ? undefined : "EditorSTI2026!Content");
 
   if (editorEmail && editorPassword && cleanEmail === editorEmail.toLowerCase() && pass === editorPassword) {
     const user: AdminUser = {

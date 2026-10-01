@@ -1,0 +1,170 @@
+import { describe, it, before, after } from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const BASE_URL = "http://localhost:3000";
+
+describe("E2E Local System Integration Flow (docs/QA.md)", () => {
+  const STUDENTS_FILE = path.join(ROOT, "src", "data", "students.json");
+  let originalStudentsJson = "";
+
+  before(() => {
+    assert.ok(fs.existsSync(STUDENTS_FILE), "students.json must exist");
+    originalStudentsJson = fs.readFileSync(STUDENTS_FILE, "utf-8");
+  });
+
+  after(() => {
+    // Restore original students.json to keep repository clean
+    if (originalStudentsJson) {
+      fs.writeFileSync(STUDENTS_FILE, originalStudentsJson, "utf-8");
+    }
+  });
+
+  it("1. Verifies unauthenticated access to /admin redirects to /admin/login", async () => {
+    const res = await fetch(`${BASE_URL}/admin`, { redirect: "manual" });
+    assert.ok([307, 308].includes(res.status), `Expected redirect status, got ${res.status}`);
+    const location = res.headers.get("location");
+    assert.ok(
+      location?.includes("/admin/login"),
+      `Expected redirect to /admin/login, got ${location}`,
+    );
+  });
+
+  it("2. Verifies unauthenticated access to /admin/dashboard redirects to /admin/login with redirect param", async () => {
+    const res = await fetch(`${BASE_URL}/admin/dashboard`, { redirect: "manual" });
+    assert.ok([307, 308].includes(res.status), `Expected redirect status, got ${res.status}`);
+    const location = res.headers.get("location");
+    assert.ok(
+      location?.includes("/admin/login?redirect=%2Fadmin%2Fdashboard"),
+      `Expected redirect with param, got ${location}`,
+    );
+  });
+
+  it("3. Verifies student lifecycle: Draft -> Hidden -> Published -> Visible -> Cleanup", async () => {
+    const syntheticStudentId = "e2e-synthetic-test-student";
+    const syntheticStudent = {
+      id: syntheticStudentId,
+      name: "E2E Synthetic Student",
+      role: "Software Engineer",
+      bio: "Synthetic bio for automated verification",
+      interests: ["AI", "Web"],
+      consentPublic: true,
+      publishStatus: "draft",
+    };
+
+    // Step A: Save student as DRAFT into store
+    const currentStudents = JSON.parse(fs.readFileSync(STUDENTS_FILE, "utf-8"));
+    // Remove if already exists
+    const filtered = currentStudents.filter((s) => s.id !== syntheticStudentId);
+    filtered.push(syntheticStudent);
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+
+    // Step B: Verify NOT visible on public directory
+    const publicDirRes = await fetch(`${BASE_URL}/students`);
+    assert.equal(publicDirRes.status, 200);
+    const publicHtml = await publicDirRes.text();
+    assert.equal(
+      publicHtml.includes("E2E Synthetic Student"),
+      false,
+      "Draft student must NOT appear on public directory /students",
+    );
+
+    // Step C: Verify direct slug access returns 404
+    const directSlugRes = await fetch(`${BASE_URL}/students/${syntheticStudentId}`);
+    assert.equal(
+      directSlugRes.status,
+      404,
+      "Draft student slug must return 404 on public route",
+    );
+
+    // Step D: Update student to PUBLISHED
+    const updatedStudents = JSON.parse(fs.readFileSync(STUDENTS_FILE, "utf-8"));
+    const target = updatedStudents.find((s) => s.id === syntheticStudentId);
+    assert.ok(target, "Synthetic student must exist");
+    target.publishStatus = "published";
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(updatedStudents, null, 2), "utf-8");
+
+    // Step E: Verify now VISIBLE on public directory
+    const publicDirRes2 = await fetch(`${BASE_URL}/students`);
+    assert.equal(publicDirRes2.status, 200);
+    const publicHtml2 = await publicDirRes2.text();
+    assert.equal(
+      publicHtml2.includes("E2E Synthetic Student"),
+      true,
+      "Published student MUST appear on public directory /students",
+    );
+
+    // Step F: Verify direct slug access succeeds with HTTP 200
+    const directSlugRes2 = await fetch(`${BASE_URL}/students/${syntheticStudentId}`);
+    assert.equal(
+      directSlugRes2.status,
+      200,
+      "Published student slug must return HTTP 200",
+    );
+    const directSlugHtml = await directSlugRes2.text();
+    assert.equal(
+      directSlugHtml.includes("E2E Synthetic Student"),
+      true,
+      "Direct slug page must contain student name",
+    );
+
+    // Step G: Cleanup synthetic student
+    const cleanedStudents = JSON.parse(fs.readFileSync(STUDENTS_FILE, "utf-8")).filter(
+      (s) => s.id !== syntheticStudentId,
+    );
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(cleanedStudents, null, 2), "utf-8");
+
+    // Verify removed
+    const verifyRemovedRes = await fetch(`${BASE_URL}/students`);
+    const verifyRemovedHtml = await verifyRemovedRes.text();
+    assert.equal(
+      verifyRemovedHtml.includes("E2E Synthetic Student"),
+      false,
+      "Student must be completely removed from public site after cleanup",
+    );
+  });
+
+  it("4. Verifies Consent Firewall: Published with consentPublic=false remains hidden", async () => {
+    const unconsentedStudentId = "e2e-unconsented-test-student";
+    const unconsentedStudent = {
+      id: unconsentedStudentId,
+      name: "Unconsented Test Student",
+      role: "Security Analyst",
+      consentPublic: false,
+      publishStatus: "published", // Published BUT consent is false!
+    };
+
+    const currentStudents = JSON.parse(fs.readFileSync(STUDENTS_FILE, "utf-8"));
+    const filtered = currentStudents.filter((s) => s.id !== unconsentedStudentId);
+    filtered.push(unconsentedStudent);
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+
+    try {
+      // Must NOT appear on directory
+      const dirRes = await fetch(`${BASE_URL}/students`);
+      const dirHtml = await dirRes.text();
+      assert.equal(
+        dirHtml.includes("Unconsented Test Student"),
+        false,
+        "Student with consentPublic=false must NEVER appear on public directory",
+      );
+
+      // Direct slug lookup must return 404
+      const slugRes = await fetch(`${BASE_URL}/students/${unconsentedStudentId}`);
+      assert.equal(
+        slugRes.status,
+        404,
+        "Direct slug lookup for unconsented student must return 404",
+      );
+    } finally {
+      // Always cleanup
+      const cleaned = JSON.parse(fs.readFileSync(STUDENTS_FILE, "utf-8")).filter(
+        (s) => s.id !== unconsentedStudentId,
+      );
+      fs.writeFileSync(STUDENTS_FILE, JSON.stringify(cleaned, null, 2), "utf-8");
+    }
+  });
+});
