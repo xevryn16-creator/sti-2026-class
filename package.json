@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ingest": "node scripts/ingest.mjs"
   },
   "dependencies": {
     "next": "^15.5.27",
@@ -19,6 +20,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "lucide-react": "^1.49.0",
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3"
   }
 }

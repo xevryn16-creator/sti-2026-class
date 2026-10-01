@@ -19,7 +19,7 @@ export default function SiteFooter() {
             <p className="t-subheading">{SITE_FULL_NAME}</p>
             <Typography variant="body" color="graphite" className="site-footer__meta">
               {[cls.university, cls.faculty]
-                .filter((v) => v && !v.startsWith("[CONTENT NEEDED]"))
+                .filter((v) => v && !v.startsWith("["))
                 .join(" — ") || "Buku tahunan digital angkatan Sistem dan Teknologi Informasi 2026."}
             </Typography>
           </div>

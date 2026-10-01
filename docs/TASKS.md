@@ -488,14 +488,14 @@
 **ID:** T-401  
 **TITLE:** Compile Static Student Data (`students.json`)  
 **PRIORITY:** P0  
-**STATUS:** BLOCKED — [CONTENT NEEDED] (Student submissions & consent forms)  
+**STATUS:** BLOCKED — [CONTENT NEEDED] (Awaiting authentic student submissions & signed consent forms; ingestion tool `scripts/ingest.mjs` and intake guide `docs/CONTENT_MANIFEST.md` are READY)  
 **PURPOSE:** Create the type-safe static data store for all cohort students.  
-**SCOPE:** Data file  
-**FILES/AREA:** `PROPOSED FILE: src/data/students.json`  
+**SCOPE:** Data file & Ingestion pipeline  
+**FILES/AREA:** `src/data/students.json`, `scripts/ingest.mjs`, `docs/CONTENT_MANIFEST.md`  
 **DEPENDENCIES:** T-003, T-112, Cohort data collection  
-**IMPLEMENTATION NOTES:** All entries require `consentPublic: boolean`. Strict exclusion of prohibited PII.  
+**IMPLEMENTATION NOTES:** Automated ingestion pipeline (`scripts/ingest.mjs`) implemented with PII firewall, consent gate, Sharp image optimization, EXIF GPS stripping, and referential integrity check. Ready to process `inbox/` submissions via `npm run ingest`.  
 **ACCEPTANCE CRITERIA:** Valid JSON matching `StudentEntity` interface; zero unconsented records set to true.  
-**TEST REQUIREMENTS:** Build-time schema validation script via `src/lib/data.ts`.
+**TEST REQUIREMENTS:** Build-time schema validation script via `src/lib/data.ts` and `npm run ingest -- --dry-run`.
 
 ---
 
@@ -562,14 +562,14 @@
 **ID:** T-501  
 **TITLE:** Compile Static Project Data (`projects.json`)  
 **PRIORITY:** P1  
-**STATUS:** BLOCKED — [CONTENT NEEDED] (Student project submissions)  
+**STATUS:** BLOCKED — [CONTENT NEEDED] (Awaiting student project submissions; ingestion pipeline `scripts/ingest.mjs` and intake specs `docs/CONTENT_MANIFEST.md` are READY)  
 **PURPOSE:** Static data store for capstones, hackathon projects, and software builds.  
-**SCOPE:** Data file  
-**FILES/AREA:** `PROPOSED FILE: src/data/projects.json`  
+**SCOPE:** Data file & Ingestion pipeline  
+**FILES/AREA:** `src/data/projects.json`, `scripts/ingest.mjs`, `docs/CONTENT_MANIFEST.md`  
 **DEPENDENCIES:** T-003, T-112, Project data submission  
-**IMPLEMENTATION NOTES:** Schema matches `ProjectEntity`. Team members link to `students.json` slugs.  
+**IMPLEMENTATION NOTES:** Ingestion pipeline validates team member slugs against `students.json` for referential integrity. Schema matches `ProjectEntity`. Ready to intake via `npm run ingest`.  
 **ACCEPTANCE CRITERIA:** Valid JSON; team member slugs cross-reference existing students.  
-**TEST REQUIREMENTS:** Build integrity check via `src/lib/data.ts`.
+**TEST REQUIREMENTS:** Build integrity check via `src/lib/data.ts` and `npm run ingest -- --dry-run`.  
 
 ---
 
@@ -618,14 +618,14 @@
 **ID:** T-505  
 **TITLE:** Compile Campus Life & Memory Data (`campus.json`, `memories.json`)  
 **PRIORITY:** P2  
-**STATUS:** BLOCKED — [CONTENT NEEDED] (Cohort photo archives)  
+**STATUS:** BLOCKED — [CONTENT NEEDED] (Awaiting authentic cohort photo archives; ingestion pipeline `scripts/ingest.mjs` with Sharp image intake and EXIF GPS stripping is READY)  
 **PURPOSE:** Static data stores for candid moments and curated photo stories.  
-**SCOPE:** Data files  
-**FILES/AREA:** `PROPOSED FILE: src/data/campus.json`, `PROPOSED FILE: src/data/memories.json`  
+**SCOPE:** Data files & Image intake  
+**FILES/AREA:** `src/data/campus.json`, `src/data/memories.json`, `scripts/ingest.mjs`, `docs/CONTENT_MANIFEST.md`  
 **DEPENDENCIES:** T-003, T-112, Photo archive submissions  
-**IMPLEMENTATION NOTES:** All photos include accessible `alt` descriptions.  
+**IMPLEMENTATION NOTES:** Ingestion pipeline automatically optimizes photos and strips privacy-sensitive EXIF/GPS metadata via Sharp. All photos include accessible `alt` descriptions.  
 **ACCEPTANCE CRITERIA:** Valid JSON; referenced images exist in `/public/images/campus/`.  
-**TEST REQUIREMENTS:** File existence validator.
+**TEST REQUIREMENTS:** File existence validator via `scripts/ingest.mjs` and `npm run typecheck`.
 
 ---
 
@@ -674,16 +674,17 @@
 **ID:** T-601  
 **TITLE:** Compile Events, Achievements & Timeline Data  
 **PRIORITY:** P2  
-**STATUS:** BLOCKED — [CONTENT NEEDED] (Historical class records)  
+**STATUS:** BLOCKED — [CONTENT NEEDED] (Awaiting authentic historical cohort records; ingestion pipeline `scripts/ingest.mjs` and validation schemas in `docs/CONTENT_MANIFEST.md` are READY)  
 **PURPOSE:** Static data compilation for events (`events.json`), achievements (`achievements.json`), and timeline milestones (`timeline.json`).  
-**SCOPE:** Data files  
-**FILES/AREA:** `PROPOSED FILE: src/data/events.json`, `PROPOSED FILE: src/data/achievements.json`, `PROPOSED FILE: src/data/timeline.json`  
+**SCOPE:** Data files & Ingestion pipeline  
+**FILES/AREA:** `src/data/events.json`, `src/data/achievements.json`, `src/data/timeline.json`, `scripts/ingest.mjs`, `docs/CONTENT_MANIFEST.md`  
 **DEPENDENCIES:** T-003, T-112, Cohort historical archives  
 **IMPLEMENTATION NOTES:**  
 - **Workflow Rationale for Atomic Scope:** All three files represent the historical narrative of the cohort (2022–2026), authored and verified in a single collaborative session by the historical archive committee. Keeping them unified prevents task fragmentation while maintaining clear schema separation.
+- Ingestion pipeline (`scripts/ingest.mjs`) automatically checks referential integrity and consent gates for student awards.
 - All achievements must have verified consent.
 **ACCEPTANCE CRITERIA:** Valid JSON matching respective entity schemas; zero unconsented achievements.  
-**TEST REQUIREMENTS:** Schema validation test via `src/lib/data.ts`.
+**TEST REQUIREMENTS:** Schema validation test via `src/lib/data.ts` and `npm run ingest -- --dry-run`.
 
 ---
 

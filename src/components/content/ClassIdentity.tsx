@@ -27,9 +27,9 @@ export default function ClassIdentity() {
         />
         <div className="class-identity__statement" data-reveal>
           {isPlaceholder(cls.statement) ? (
-            <p className="t-body class-identity__text content-needed">
-              [CONTENT NEEDED] — Pernyataan identitas angkatan sedang disusun
-              oleh perwakilan kelas.
+            <p className="t-body class-identity__text class-identity__text--empty">
+              Pernyataan identitas dan narasi angkatan sedang dalam tahap kurasi
+              bersama oleh perwakilan kelas STI 2026.
             </p>
           ) : (
             <p className="t-body class-identity__text">{cls.statement}</p>
