@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ScrollReveal from "@/components/experience/ScrollReveal";
@@ -15,9 +15,8 @@ import "@/components/content/student-profile.css";
 import "@/components/content/project-detail.css";
 import "@/components/content/home.css";
 
-const geist = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
   variable: "--font-geist-next",
 });
@@ -62,7 +61,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={geist.variable} suppressHydrationWarning>
+    <html lang="id" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: REVEAL_BOOTSTRAP }} />
       </head>
