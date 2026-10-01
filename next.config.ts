@@ -39,9 +39,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "60mb",
     },
-    // `/admin/*` is middleware-matched, so the request is buffered there too
-    // (Next.js caps that at 10 MB by default, truncating larger uploads).
-    middlewareClientMaxBodySize: "60mb",
   },
   async headers() {
     return [
