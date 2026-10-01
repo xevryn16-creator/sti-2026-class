@@ -63,6 +63,8 @@ export interface StudentEntity {
   socialLinks?: SocialLink[];
   /** MANDATORY: explicit consent to appear on the public site. */
   consentPublic: boolean;
+  /** Publication lifecycle status (defaults to published if omitted). */
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== Role ============================== */
@@ -99,6 +101,7 @@ export interface ProjectEntity {
   gallery?: string[];
   /** If true, receives the Broadcast Gradient frame treatment. */
   featured?: boolean;
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== CampusPhoto ============================== */
@@ -111,6 +114,7 @@ export interface CampusPhotoEntity {
   activity?: string;
   /** "YYYY-MM" or approximate semester label */
   date?: string;
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== Event ============================== */
@@ -132,6 +136,7 @@ export interface EventEntity {
   category?: EventCategory;
   location?: string;
   participantsCount?: number;
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== Memory ============================== */
@@ -149,6 +154,7 @@ export interface MemoryEntity {
   photos: MemoryPhoto[];
   period?: string;
   category?: string;
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== Achievement ============================== */
@@ -170,6 +176,7 @@ export interface AchievementEntity {
   description?: string;
   proofUrl?: string;
   consentPublic: boolean;
+  publishStatus?: "draft" | "published" | "archived";
 }
 
 /* ============================== TimelineEntry ============================== */
@@ -190,4 +197,5 @@ export interface TimelineEntryEntity {
   description?: string;
   image?: string;
   category?: TimelineCategory;
+  publishStatus?: "draft" | "published" | "archived";
 }

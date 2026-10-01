@@ -4,9 +4,7 @@ import type { AdminSession, AdminUser, UserRole } from "@/types/cms";
 const COOKIE_NAME = "sti_admin_session";
 const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 days
 
-// Default development credentials (can be overridden via environment variables)
-const DEFAULT_EMAIL = process.env.ADMIN_DEFAULT_EMAIL ?? "admin@sti2026.itb.ac.id";
-const DEFAULT_PASSWORD = process.env.ADMIN_DEFAULT_PASSWORD ?? "AdminSTI2026!Editorial";
+// Environment credentials & secret key
 const SECRET_KEY = process.env.ADMIN_SESSION_SECRET ?? "sti2026-development-secret-key-32chars";
 
 // Derive HMAC key using Web Crypto (Edge & Node compatible)
@@ -93,9 +91,14 @@ export async function login(
   pass: string,
 ): Promise<{ success: boolean; error?: string; session?: AdminSession }> {
   const cleanEmail = email.trim().toLowerCase();
+  const isProduction = process.env.NODE_ENV === "production";
 
-  // Support local dev credential or Supabase Auth
-  if (cleanEmail === DEFAULT_EMAIL.toLowerCase() && pass === DEFAULT_PASSWORD) {
+  // In production, require explicit environment credentials or Supabase Auth.
+  // Never allow hardcoded development credentials in production.
+  const adminEmail = process.env.ADMIN_EMAIL ?? process.env.ADMIN_DEFAULT_EMAIL ?? (isProduction ? undefined : "admin@sti2026.itb.ac.id");
+  const adminPassword = process.env.ADMIN_PASSWORD ?? process.env.ADMIN_DEFAULT_PASSWORD ?? (isProduction ? undefined : "AdminSTI2026!Editorial");
+
+  if (adminEmail && adminPassword && cleanEmail === adminEmail.toLowerCase() && pass === adminPassword) {
     const user: AdminUser = {
       id: "admin-default",
       email: cleanEmail,
@@ -112,7 +115,7 @@ export async function login(
     const cookieStore = await cookies();
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
       maxAge: SESSION_MAX_AGE_SEC,
@@ -121,11 +124,11 @@ export async function login(
     return { success: true, session };
   }
 
-  // Check editor account fallback if configured
-  if (
-    cleanEmail === "editor@sti2026.itb.ac.id" &&
-    pass === "EditorSTI2026!Content"
-  ) {
+  // Check editor account (development or if explicitly set in env)
+  const editorEmail = process.env.EDITOR_DEFAULT_EMAIL ?? (isProduction ? undefined : "editor@sti2026.itb.ac.id");
+  const editorPassword = process.env.EDITOR_DEFAULT_PASSWORD ?? (isProduction ? undefined : "EditorSTI2026!Content");
+
+  if (editorEmail && editorPassword && cleanEmail === editorEmail.toLowerCase() && pass === editorPassword) {
     const user: AdminUser = {
       id: "editor-default",
       email: cleanEmail,
@@ -142,7 +145,7 @@ export async function login(
     const cookieStore = await cookies();
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
       maxAge: SESSION_MAX_AGE_SEC,

@@ -77,7 +77,6 @@ export default function AdminLoginPage() {
               type="email"
               required
               autoComplete="email"
-              defaultValue="admin@sti2026.itb.ac.id"
               className="admin-form-input"
               placeholder="nama@sti2026.itb.ac.id"
             />
@@ -93,7 +92,6 @@ export default function AdminLoginPage() {
               type="password"
               required
               autoComplete="current-password"
-              defaultValue="AdminSTI2026!Editorial"
               className="admin-form-input"
               placeholder="••••••••••••"
             />
@@ -108,19 +106,6 @@ export default function AdminLoginPage() {
             {isPending ? "Memverifikasi..." : "Masuk ke Panel Redaksi"}
           </button>
         </form>
-
-        <div
-          style={{
-            marginTop: "2rem",
-            paddingTop: "1rem",
-            borderTop: "1px solid rgba(0,0,0,0.06)",
-            fontSize: "0.75rem",
-            color: "#888",
-            textAlign: "center",
-          }}
-        >
-          Kredensial dev: <code>admin@sti2026.itb.ac.id</code> / <code>AdminSTI2026!Editorial</code>
-        </div>
       </div>
     </div>
   );

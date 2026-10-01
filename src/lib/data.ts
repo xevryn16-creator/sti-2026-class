@@ -237,6 +237,7 @@ const ALL_STUDENTS: StudentEntity[] = RAW_STUDENTS.map((raw, i): StudentEntity =
     achievements: assertOptionalStringArray(s.achievements, "achievements", source),
     socialLinks,
     consentPublic: s.consentPublic,
+    publishStatus: (assertOptionalString(s.publishStatus, "publishStatus", source) as StudentEntity["publishStatus"]) ?? "published",
   };
 });
 
@@ -293,6 +294,7 @@ const ALL_PROJECTS: ProjectEntity[] = RAW_PROJECTS.map((raw, i): ProjectEntity =
     course: assertOptionalString(p.course, "course", source),
     gallery,
     featured: p.featured === true,
+    publishStatus: (assertOptionalString(p.publishStatus, "publishStatus", source) as ProjectEntity["publishStatus"]) ?? "published",
   };
 });
 
@@ -332,6 +334,7 @@ const ALL_EVENTS: EventEntity[] = RAW_EVENTS.map((raw, i): EventEntity => {
       "participantsCount",
       source,
     ),
+    publishStatus: (assertOptionalString(e.publishStatus, "publishStatus", source) as EventEntity["publishStatus"]) ?? "published",
   };
 });
 
@@ -362,6 +365,7 @@ const ALL_MEMORIES: MemoryEntity[] = RAW_MEMORIES.map((raw, i): MemoryEntity => 
     photos,
     period: assertOptionalString(m.period, "period", source),
     category: assertOptionalString(m.category, "category", source),
+    publishStatus: (assertOptionalString(m.publishStatus, "publishStatus", source) as MemoryEntity["publishStatus"]) ?? "published",
   };
 });
 
@@ -496,15 +500,20 @@ validateDatabaseIntegrity();
 /* Consent-filtered public accessors                                   */
 /* ------------------------------------------------------------------ */
 
-/** Students with explicit `consentPublic: true` — the ONLY publishable set. */
+/** Students with explicit `consentPublic: true` AND `publishStatus: 'published'`. */
 export function getStudents(): StudentEntity[] {
-  return ALL_STUDENTS.filter((s) => s.consentPublic === true);
+  return ALL_STUDENTS.filter(
+    (s) => s.consentPublic === true && (s.publishStatus === undefined || s.publishStatus === "published"),
+  );
 }
 
-/** Consent-filtered lookup. Unconsented or unknown slugs yield `null`. */
+/** Consent and publication filtered lookup. Unconsented, draft, archived, or unknown slugs yield `null`. */
 export function getStudentBySlug(slug: string): StudentEntity | null {
   const student = ALL_STUDENTS.find((s) => s.id === slug);
-  return student && student.consentPublic === true ? student : null;
+  if (!student) return null;
+  const isConsented = student.consentPublic === true;
+  const isPublished = student.publishStatus === undefined || student.publishStatus === "published";
+  return isConsented && isPublished ? student : null;
 }
 
 export function getClassData(): ClassEntity {
@@ -517,46 +526,61 @@ export function getRoles(): RoleEntity[] {
 }
 
 export function getProjects(): ProjectEntity[] {
-  return ALL_PROJECTS;
+  return ALL_PROJECTS.filter(
+    (p) => p.publishStatus === undefined || p.publishStatus === "published",
+  );
 }
 
 export function getProjectBySlug(slug: string): ProjectEntity | null {
-  return ALL_PROJECTS.find((p) => p.id === slug) ?? null;
+  const project = ALL_PROJECTS.find((p) => p.id === slug);
+  if (!project) return null;
+  const isPublished = project.publishStatus === undefined || project.publishStatus === "published";
+  return isPublished ? project : null;
 }
 
 /** Projects where the given student is a team member. */
 export function getProjectsByStudent(studentId: string): ProjectEntity[] {
-  return ALL_PROJECTS.filter((p) =>
+  return getProjects().filter((p) =>
     p.members.some((m) => m.studentId === studentId),
   );
 }
 
 export function getCampusPhotos(): CampusPhotoEntity[] {
-  return ALL_CAMPUS;
+  return ALL_CAMPUS.filter(
+    (c) => c.publishStatus === undefined || c.publishStatus === "published",
+  );
 }
 
 export function getEvents(): EventEntity[] {
-  return [...ALL_EVENTS].sort((a, b) => a.date.localeCompare(b.date));
+  return ALL_EVENTS
+    .filter((e) => e.publishStatus === undefined || e.publishStatus === "published")
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export function getMemories(): MemoryEntity[] {
-  return ALL_MEMORIES;
+  return ALL_MEMORIES.filter(
+    (m) => m.publishStatus === undefined || m.publishStatus === "published",
+  );
 }
 
-/** Only achievements with explicit publication consent, newest first. */
+/** Only achievements with explicit publication consent AND published state, newest first. */
 export function getAchievements(): AchievementEntity[] {
-  return ALL_ACHIEVEMENTS.filter((a) => a.consentPublic === true).sort((a, b) =>
-    (b.year ?? 0) - (a.year ?? 0),
-  );
+  return ALL_ACHIEVEMENTS.filter(
+    (a) =>
+      a.consentPublic === true &&
+      (a.publishStatus === undefined || a.publishStatus === "published"),
+  ).sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 }
 
 export function getAchievementsByStudent(studentId: string): AchievementEntity[] {
   return getAchievements().filter((a) => a.studentIds.includes(studentId));
 }
 
-/** Chronological 2022 → 2026 journey. */
+/** Chronological 2022 → 2026 journey with published state. */
 export function getTimeline(): TimelineEntryEntity[] {
-  return [...ALL_TIMELINE].sort((a, b) => a.date.localeCompare(b.date));
+  return ALL_TIMELINE
+    .filter((t) => t.publishStatus === undefined || t.publishStatus === "published")
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /* ------------------------------------------------------------------ */

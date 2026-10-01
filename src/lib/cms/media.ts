@@ -42,14 +42,37 @@ export function sanitizeFilename(filename: string): string {
   return `${base}-${timestamp}${ext}`;
 }
 
+const ALLOWED_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".avif",
+  ".mp4",
+  ".webm",
+  ".mov",
+];
+
 /**
- * Validate upload buffer against MIME type and size rules
+ * Validate upload buffer against MIME type, extension, and magic bytes
  */
 export function validateMediaBuffer(
   buffer: Buffer,
   mimeType: string,
   filename: string
 ): { valid: boolean; mediaType: MediaType; error?: string } {
+  const ext = path.extname(filename).toLowerCase();
+
+  // 1. Strict extension whitelist
+  if (!ALLOWED_EXTENSIONS.includes(ext)) {
+    return {
+      valid: false,
+      mediaType: "image",
+      error: `Ekstensi file '${ext}' tidak diizinkan. Berkas eksekusi, SVG, atau skrip dilarang demi keamanan.`,
+    };
+  }
+
+  // 2. MIME type whitelist
   const isImage = ALLOWED_IMAGE_MIMES.includes(mimeType);
   const isVideo = ALLOWED_VIDEO_MIMES.includes(mimeType);
 
@@ -63,6 +86,7 @@ export function validateMediaBuffer(
 
   const mediaType: MediaType = isImage ? "image" : "video";
 
+  // 3. File size limits
   if (isImage && buffer.length > MAX_IMAGE_SIZE_BYTES) {
     return {
       valid: false,
@@ -77,6 +101,38 @@ export function validateMediaBuffer(
       mediaType,
       error: `Ukuran video melebihi batas 50MB (${(buffer.length / (1024 * 1024)).toFixed(1)}MB).`,
     };
+  }
+
+  // 4. Magic bytes inspection to prevent MIME spoofing
+  if (buffer.length < 12) {
+    return {
+      valid: false,
+      mediaType,
+      error: "Berkas tidak valid atau rusak (ukuran terlalu kecil).",
+    };
+  }
+
+  // PNG magic bytes: 89 50 4E 47
+  if (mimeType === "image/png") {
+    if (buffer[0] !== 0x89 || buffer[1] !== 0x50 || buffer[2] !== 0x4e || buffer[3] !== 0x47) {
+      return { valid: false, mediaType, error: "Header berkas PNG tidak valid (MIME spoofing terdeteksi)." };
+    }
+  }
+
+  // JPEG magic bytes: FF D8 FF
+  if (mimeType === "image/jpeg") {
+    if (buffer[0] !== 0xff || buffer[1] !== 0xd8 || buffer[2] !== 0xff) {
+      return { valid: false, mediaType, error: "Header berkas JPEG tidak valid (MIME spoofing terdeteksi)." };
+    }
+  }
+
+  // WebP magic bytes: RIFF .... WEBP
+  if (mimeType === "image/webp") {
+    const isRiff = buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46;
+    const isWebp = buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50;
+    if (!isRiff || !isWebp) {
+      return { valid: false, mediaType, error: "Header berkas WebP tidak valid (MIME spoofing terdeteksi)." };
+    }
   }
 
   return { valid: true, mediaType };

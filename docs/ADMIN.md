@@ -108,11 +108,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 # CMS Admin Session Secret (Minimal 32 karakter acak)
 ADMIN_SESSION_SECRET=your-32-character-secret-key-here
 
-# Default Redaksi (Development Credentials)
-ADMIN_DEFAULT_EMAIL=admin@sti2026.itb.ac.id
-ADMIN_DEFAULT_PASSWORD=AdminSTI2026!Editorial
+# Default Redaksi (Development Bootstrap Only — Wajib diganti di production!)
+ADMIN_EMAIL=admin@sti2026.itb.ac.id
+ADMIN_PASSWORD=AdminSTI2026!Editorial
 ADMIN_DEFAULT_ROLE=admin
 ```
+
+> **PERINGATAN KEAMANAN PRODUKSI:**
+> Di lingkungan `NODE_ENV=production`, sistem otentikasi secara otomatis **menolak fallback kredensial default**. Kredensial produksi harus disetel melalui variabel lingkungan yang aman (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) atau melalui integrasi Supabase Auth. Kredensial default tidak akan pernah dibundle ke client browser dan tidak akan berfungsi di server produksi.
 
 ---
 

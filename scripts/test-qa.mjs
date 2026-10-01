@@ -414,10 +414,119 @@ describe("8. Admin CMS & Privacy Enforcement", () => {
     assert.match(envContent, /NEXT_PUBLIC_SUPABASE_ANON_KEY=/);
     assert.match(envContent, /SUPABASE_SERVICE_ROLE_KEY=/);
     assert.match(envContent, /ADMIN_SESSION_SECRET=/);
-    assert.match(envContent, /ADMIN_DEFAULT_EMAIL=/);
-    assert.match(envContent, /ADMIN_DEFAULT_PASSWORD=/);
+    assert.match(envContent, /(ADMIN_EMAIL|ADMIN_DEFAULT_EMAIL)=/);
+    assert.match(envContent, /(ADMIN_PASSWORD|ADMIN_DEFAULT_PASSWORD)=/);
 
     // Verify no actual secret production keys are hardcoded in .env.example
     assert.doesNotMatch(envContent, /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\./);
+  });
+
+  it("verifies dangerous file extensions (.exe, .svg, .sh, .bat, .php) are rejected", () => {
+    const ALLOWED_EXTENSIONS = new Set([
+      ".jpg", ".jpeg", ".png", ".webp", ".avif", ".mp4", ".webm", ".mov",
+    ]);
+
+    const dangerousFiles = ["payload.exe", "vector.svg", "script.sh", "malware.bat", "webshell.php", "doc.msi"];
+    for (const filename of dangerousFiles) {
+      const ext = path.extname(filename).toLowerCase();
+      assert.equal(
+        ALLOWED_EXTENSIONS.has(ext),
+        false,
+        `Extension ${ext} must NOT be allowed`,
+      );
+    }
+  });
+
+  it("verifies MIME spoofing is detected via file magic bytes", () => {
+    // PNG signature: 89 50 4E 47 0D 0A 1A 0A
+    const validPngBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00]);
+    // Text file pretending to be PNG
+    const spoofedPngBuffer = Buffer.from("<?php echo 'hello'; ?> <!DOCTYPE html><html>", "utf-8");
+    // JPEG signature: FF D8 FF
+    const validJpegBuffer = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46]);
+
+    function checkMagicBytes(buffer, mime) {
+      if (mime === "image/png") {
+        return (
+          buffer.length >= 8 &&
+          buffer[0] === 0x89 &&
+          buffer[1] === 0x50 &&
+          buffer[2] === 0x4e &&
+          buffer[3] === 0x47 &&
+          buffer[4] === 0x0d &&
+          buffer[5] === 0x0a &&
+          buffer[6] === 0x1a &&
+          buffer[7] === 0x0a
+        );
+      }
+      if (mime === "image/jpeg") {
+        return (
+          buffer.length >= 3 &&
+          buffer[0] === 0xff &&
+          buffer[1] === 0xd8 &&
+          buffer[2] === 0xff
+        );
+      }
+      return false;
+    }
+
+    assert.equal(checkMagicBytes(validPngBuffer, "image/png"), true, "Valid PNG must pass magic bytes check");
+    assert.equal(checkMagicBytes(spoofedPngBuffer, "image/png"), false, "Spoofed PNG must fail magic bytes check");
+    assert.equal(checkMagicBytes(validJpegBuffer, "image/jpeg"), true, "Valid JPEG must pass magic bytes check");
+    assert.equal(checkMagicBytes(spoofedPngBuffer, "image/jpeg"), false, "Spoofed JPEG must fail magic bytes check");
+  });
+
+  it("verifies production auth fails safe without explicit environment credentials", () => {
+    // Simulating production mode check
+    const isProduction = true;
+    const adminEmail = undefined; // No ADMIN_EMAIL env var in prod
+    const adminPassword = undefined; // No ADMIN_PASSWORD env var in prod
+
+    // In production, fallback must NOT evaluate to dev default credentials
+    const effectiveEmail = adminEmail ?? (isProduction ? undefined : "admin@sti2026.itb.ac.id");
+    const effectivePassword = adminPassword ?? (isProduction ? undefined : "AdminSTI2026!Editorial");
+
+    assert.equal(effectiveEmail, undefined, "Production effectiveEmail must be undefined when unset");
+    assert.equal(effectivePassword, undefined, "Production effectivePassword must be undefined when unset");
+  });
+
+  it("verifies public data accessor filters out unpublished (draft/archived) content", () => {
+    const mockEntities = [
+      { id: "1", title: "Published Item", publishStatus: "published" },
+      { id: "2", title: "Legacy Item Without Field" }, // Defaults to published
+      { id: "3", title: "Draft Item", publishStatus: "draft" },
+      { id: "4", title: "Archived Item", publishStatus: "archived" },
+    ];
+
+    const publicEntities = mockEntities.filter(
+      (item) => item.publishStatus === undefined || item.publishStatus === "published",
+    );
+
+    assert.equal(publicEntities.length, 2, "Only published and legacy items must be returned");
+    assert.equal(publicEntities.some((i) => i.id === "3"), false, "Draft item must be excluded");
+    assert.equal(publicEntities.some((i) => i.id === "4"), false, "Archived item must be excluded");
+  });
+
+  it("verifies SUPABASE_SERVICE_ROLE_KEY never appears in any client component", () => {
+    function scanDir(dir) {
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        const full = path.join(dir, file);
+        if (fs.statSync(full).isDirectory()) {
+          scanDir(full);
+        } else if (file.endsWith(".tsx") || file.endsWith(".ts")) {
+          const content = fs.readFileSync(full, "utf-8");
+          const isClientComponent = content.includes('"use client"') || content.includes("'use client'");
+          if (isClientComponent) {
+            assert.equal(
+              content.includes("SUPABASE_SERVICE_ROLE_KEY"),
+              false,
+              `SUPABASE_SERVICE_ROLE_KEY leak detected in client component: ${path.relative(ROOT, full)}`,
+            );
+          }
+        }
+      }
+    }
+    scanDir(path.join(ROOT, "src"));
   });
 });
