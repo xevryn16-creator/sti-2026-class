@@ -23,7 +23,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sti-2026.vercel.app",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://sti-2026-class.vercel.app",
   ),
   title: {
     default: SITE_FULL_NAME,

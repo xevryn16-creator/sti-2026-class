@@ -2,7 +2,7 @@ import type { SocialPlatform } from "@/types";
 
 export const SITE_NAME = "STI 2026";
 export const SITE_FULL_NAME = "STI 2026 — Sistem dan Teknologi Informasi";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sti-2026.vercel.app";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sti-2026-class.vercel.app";
 
 export interface NavLink {
   href: string;
