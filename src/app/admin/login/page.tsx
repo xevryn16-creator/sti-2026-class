@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useActionState, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/admin/actions/auth";
 import { sanitizeAdminRedirect } from "@/lib/cms/redirect";
@@ -10,6 +11,13 @@ export default function AdminLoginPage() {
   const redirectTo = sanitizeAdminRedirect(searchParams.get("redirect"));
 
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const fillDev = (devEmail: string, devPass: string) => {
+    setEmail(devEmail);
+    setPassword(devPass);
+  };
 
   return (
     <div
@@ -37,7 +45,7 @@ export default function AdminLoginPage() {
           <h1
             style={{
               fontSize: "1.5rem",
-              fontWeight: 600,
+              fontWeight: 500,
               letterSpacing: "-0.03em",
               margin: "0.25rem 0 0.5rem 0",
             }}
@@ -80,6 +88,8 @@ export default function AdminLoginPage() {
               autoComplete="email"
               className="admin-form-input"
               placeholder="nama@sti2026.itb.ac.id"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -95,6 +105,8 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
               className="admin-form-input"
               placeholder="••••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -106,6 +118,75 @@ export default function AdminLoginPage() {
           >
             {isPending ? "Memverifikasi..." : "Masuk ke Panel Redaksi"}
           </button>
+
+          {/* Quick-fill Dev Login Credentials */}
+          <div
+            style={{
+              marginTop: "1.5rem",
+              padding: "0.875rem",
+              backgroundColor: "#f9f8f6",
+              borderRadius: "6px",
+              border: "1px dashed #d1ceca",
+              fontSize: "0.8125rem",
+            }}
+          >
+            <div style={{ fontWeight: 500, color: "#111", marginBottom: "0.25rem" }}>
+              ⚡ Dev Login (1-Klik Isi Kredensial)
+            </div>
+            <p style={{ margin: "0 0 0.625rem 0", color: "#666", fontSize: "0.75rem", lineHeight: 1.4 }}>
+              Pilih peran akun pengembang di bawah untuk langsung mengisi formulir:
+            </p>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button
+                type="button"
+                onClick={() => fillDev("admin@sti2026.itb.ac.id", "AdminSTI2026!Editorial")}
+                style={{
+                  flex: 1,
+                  padding: "0.45rem 0.5rem",
+                  fontSize: "0.75rem",
+                  borderRadius: "200px",
+                  border: "1px solid #000",
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontWeight: 500,
+                }}
+              >
+                Akun Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDev("editor@sti2026.itb.ac.id", "EditorSTI2026!Content")}
+                style={{
+                  flex: 1,
+                  padding: "0.45rem 0.5rem",
+                  fontSize: "0.75rem",
+                  borderRadius: "200px",
+                  border: "1px solid #ccc",
+                  backgroundColor: "#fff",
+                  color: "#111",
+                  cursor: "pointer",
+                  fontWeight: 500,
+                }}
+              >
+                Akun Editor
+              </button>
+            </div>
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: "1.25rem" }}>
+            <Link
+              href="/"
+              style={{
+                fontSize: "0.8125rem",
+                color: "#666",
+                textDecoration: "underline",
+                textUnderlineOffset: "4px",
+              }}
+            >
+              ← Kembali ke Beranda Situs
+            </Link>
+          </div>
         </form>
       </div>
     </div>

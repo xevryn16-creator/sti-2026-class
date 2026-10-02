@@ -14,7 +14,16 @@ export default function SiteHeader() {
           STI 2026
         </Link>
         <NavLinks className="site-header__links" />
-        <NavDrawer />
+        <div className="site-header__actions">
+          <Link
+            href="/admin"
+            className="site-header__dev-login"
+            aria-label="Dev Login — Portal Redaksi"
+          >
+            Dev Login
+          </Link>
+          <NavDrawer />
+        </div>
       </div>
     </header>
   );

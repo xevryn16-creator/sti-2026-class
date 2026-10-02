@@ -136,6 +136,15 @@ export default function NavDrawer() {
                 })}
               </ul>
             </nav>
+            <div className="nav-drawer__footer">
+              <Link
+                href="/admin"
+                className="nav-drawer__dev-login"
+                onClick={() => setOpen(false)}
+              >
+                Portal Redaksi (Dev Login)
+              </Link>
+            </div>
           </div>
         </div>
       ) : null}

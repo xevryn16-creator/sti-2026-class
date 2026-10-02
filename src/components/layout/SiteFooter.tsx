@@ -32,6 +32,11 @@ export default function SiteFooter() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/admin" className="nav-link site-footer__dev-link">
+                  Portal Redaksi (Dev Login)
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
