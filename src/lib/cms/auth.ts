@@ -59,18 +59,40 @@ export async function login(
     };
   }
 
-  // In production, require explicit environment credentials or Supabase Auth.
+  // In production, require explicit environment credentials.
   // Never allow hardcoded development credentials in production.
   const adminEmail = process.env.ADMIN_EMAIL ?? process.env.ADMIN_DEFAULT_EMAIL ?? (isProduction ? undefined : "admin@sti2026.itb.ac.id");
   const adminPassword = process.env.ADMIN_PASSWORD ?? process.env.ADMIN_DEFAULT_PASSWORD ?? (isProduction ? undefined : "AdminSTI2026!Editorial");
 
-  if (adminEmail && adminPassword && cleanEmail === adminEmail.toLowerCase() && pass === adminPassword) {
+  // Debug logging — visible in Vercel Function Logs to diagnose env var issues.
+  if (isProduction) {
+    console.info("[auth] Login attempt for:", cleanEmail);
+    console.info("[auth] ADMIN_EMAIL configured:", Boolean(adminEmail));
+    console.info("[auth] ADMIN_PASSWORD configured:", Boolean(adminPassword));
+    console.info("[auth] NODE_ENV:", process.env.NODE_ENV);
+  }
+
+  if (!adminEmail || !adminPassword) {
+    console.error(
+      "[auth] ADMIN_EMAIL or ADMIN_PASSWORD not configured in Vercel environment variables.",
+      "Please set ADMIN_EMAIL and ADMIN_PASSWORD in Vercel Dashboard > Project Settings > Environment Variables.",
+    );
+    return {
+      success: false,
+      error: isProduction
+        ? "Akun admin belum dikonfigurasi di server. Periksa environment variables ADMIN_EMAIL dan ADMIN_PASSWORD di Vercel Dashboard."
+        : "Email atau kata sandi tidak valid.",
+    };
+  }
+
+  if (cleanEmail === adminEmail.toLowerCase() && pass === adminPassword) {
     const session = buildSession(
       cleanEmail,
       "Tim Administrator STI 2026",
       (process.env.ADMIN_DEFAULT_ROLE as UserRole) ?? "admin",
     );
     await issueSession(session);
+    if (isProduction) console.info("[auth] Admin login successful:", cleanEmail);
     return { success: true, session };
   }
 
@@ -81,9 +103,11 @@ export async function login(
   if (editorEmail && editorPassword && cleanEmail === editorEmail.toLowerCase() && pass === editorPassword) {
     const session = buildSession(cleanEmail, "Tim Redaksi STI 2026", "editor");
     await issueSession(session);
+    if (isProduction) console.info("[auth] Editor login successful:", cleanEmail);
     return { success: true, session };
   }
 
+  if (isProduction) console.warn("[auth] Login failed for:", cleanEmail, "- credentials mismatch");
   return { success: false, error: "Email atau kata sandi tidak valid." };
 }
 
